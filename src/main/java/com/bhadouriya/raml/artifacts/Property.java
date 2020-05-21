@@ -10,9 +10,9 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Property {
 
-    private final List<String> dependencies = new ArrayList<>();
     private BeanObject beanObject;
     private String defaultValue;
+    private final List<String> dependencies = new ArrayList<>();
     private String description;
     private List<?> enumValues;
     private String example;
@@ -41,16 +41,8 @@ public class Property {
         return beanObject;
     }
 
-    public void setBeanObject(BeanObject beanObject) {
-        this.beanObject = beanObject;
-    }
-
     public String getDefaultValue() {
         return defaultValue;
-    }
-
-    public void setDefaultValue(String defaultValue) {
-        this.defaultValue = defaultValue;
     }
 
     public List<String> getDependencies() {
@@ -61,116 +53,124 @@ public class Property {
         return description;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
     public List<?> getEnumValues() {
         return enumValues;
-    }
-
-    public void setEnumValues(List<?> enumValues) {
-        this.enumValues = enumValues;
     }
 
     public String getExample() {
         return example;
     }
 
-    public void setExample(String example) {
-        this.example = example;
-    }
-
     public List<String> getExamples() {
         return examples;
-    }
-
-    public void setExamples(List<String> examples) {
-        this.examples = examples;
     }
 
     public String getFormat() {
         return format;
     }
 
-    public void setFormat(String format) {
-        this.format = format;
-    }
-
     public Property getItems() {
         return items;
-    }
-
-    public void setItems(Property items) {
-        this.items = items;
     }
 
     public Number getMax() {
         return max;
     }
 
-    public void setMax(Number max) {
-        this.max = max;
-    }
-
     public Number getMin() {
         return min;
-    }
-
-    public void setMin(Number min) {
-        this.min = min;
     }
 
     public Double getMultipleOf() {
         return multipleOf;
     }
 
-    public void setMultipleOf(Double multipleOf) {
-        this.multipleOf = multipleOf;
-    }
-
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public boolean isRequired() {
         return required;
     }
 
-    public void setRequired(boolean required) {
-        this.required = required;
-    }
-
     public String getSchemeContnt() {
         return schemeContnt;
-    }
-
-    public void setSchemeContnt(String schemeContnt) {
-        this.schemeContnt = schemeContnt;
     }
 
     public String getType() {
         return type;
     }
 
-    public void setType(String type) {
-        this.type = type;
-    }
-
     public boolean isUniqueItems() {
         return uniqueItems;
     }
 
-    public void setUniqueItems(boolean uniqueItems) {
-        this.uniqueItems = uniqueItems;
-    }
-
     public String getValue() {
         return value;
+    }
+
+    public void setBeanObject(BeanObject beanObject) {
+        this.beanObject = beanObject;
+    }
+
+    public void setDefaultValue(String defaultValue) {
+        this.defaultValue = defaultValue;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setEnumValues(List<?> enumValues) {
+        this.enumValues = enumValues;
+    }
+
+    public void setExample(String example) {
+        this.example = example;
+    }
+
+    public void setExamples(List<String> examples) {
+        this.examples = examples;
+    }
+
+    public void setFormat(String format) {
+        this.format = format;
+    }
+
+    public void setItems(Property items) {
+        this.items = items;
+    }
+
+    public void setMax(Number max) {
+        this.max = max;
+    }
+
+    public void setMin(Number min) {
+        this.min = min;
+    }
+
+    public void setMultipleOf(Double multipleOf) {
+        this.multipleOf = multipleOf;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setRequired(boolean required) {
+        this.required = required;
+    }
+
+    public void setSchemeContnt(String schemeContnt) {
+        this.schemeContnt = schemeContnt;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public void setUniqueItems(boolean uniqueItems) {
+        this.uniqueItems = uniqueItems;
     }
 
     public void setValue(String value) {

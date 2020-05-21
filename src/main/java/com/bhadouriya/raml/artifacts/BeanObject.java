@@ -11,11 +11,10 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class BeanObject {
-    private final List<String> dependencies = new ArrayList<>();
-    private final List<Property> properties = new ArrayList<>();
     @JsonIgnore
     private boolean additionalProperties;
     private String defaultValue;
+    private final List<String> dependencies = new ArrayList<>();
     private String description;
     private String discriminator;
     private String discriminatorValue;
@@ -24,6 +23,7 @@ public class BeanObject {
     private Number maxProperties;
     private Number minProperties;
     private String name;
+    private final List<Property> properties = new ArrayList<>();
     private boolean required;
 
     public BeanObject() {
@@ -37,16 +37,8 @@ public class BeanObject {
         return additionalProperties;
     }
 
-    public void setAdditionalProperties(boolean additionalProperties) {
-        this.additionalProperties = additionalProperties;
-    }
-
     public String getDefaultValue() {
         return defaultValue;
-    }
-
-    public void setDefaultValue(String defaultValue) {
-        this.defaultValue = defaultValue;
     }
 
     public List<String> getDependencies() {
@@ -57,56 +49,28 @@ public class BeanObject {
         return description;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
     public String getDiscriminator() {
         return discriminator;
-    }
-
-    public void setDiscriminator(String discriminator) {
-        this.discriminator = discriminator;
     }
 
     public String getDiscriminatorValue() {
         return discriminatorValue;
     }
 
-    public void setDiscriminatorValue(String discriminatorValue) {
-        this.discriminatorValue = discriminatorValue;
-    }
-
     public String getExample() {
         return example;
-    }
-
-    public void setExample(String example) {
-        this.example = example;
     }
 
     public List<String> getExamples() {
         return examples;
     }
 
-    public void setExamples(List<String> examples) {
-        this.examples = examples;
-    }
-
     public Number getMaxProperties() {
         return maxProperties;
     }
 
-    public void setMaxProperties(Number maxProperties) {
-        this.maxProperties = maxProperties;
-    }
-
     public Number getMinProperties() {
         return minProperties;
-    }
-
-    public void setMinProperties(Number minProperties) {
-        this.minProperties = minProperties;
     }
 
     public String getName() {
@@ -119,6 +83,42 @@ public class BeanObject {
 
     public boolean isRequired() {
         return required;
+    }
+
+    public void setAdditionalProperties(boolean additionalProperties) {
+        this.additionalProperties = additionalProperties;
+    }
+
+    public void setDefaultValue(String defaultValue) {
+        this.defaultValue = defaultValue;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setDiscriminator(String discriminator) {
+        this.discriminator = discriminator;
+    }
+
+    public void setDiscriminatorValue(String discriminatorValue) {
+        this.discriminatorValue = discriminatorValue;
+    }
+
+    public void setExample(String example) {
+        this.example = example;
+    }
+
+    public void setExamples(List<String> examples) {
+        this.examples = examples;
+    }
+
+    public void setMaxProperties(Number maxProperties) {
+        this.maxProperties = maxProperties;
+    }
+
+    public void setMinProperties(Number minProperties) {
+        this.minProperties = minProperties;
     }
 
     public void setRequired(boolean required) {

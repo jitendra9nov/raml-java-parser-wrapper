@@ -19,8 +19,6 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class WrapperApi {
     private final List<WrapperResource> wrapperResources = new ArrayList<>(5);
-    private final List<WrapperSecurityScheme> secureBy = new ArrayList<>(5);
-    private final List<WrapperSecurityScheme> securitySchemes = new ArrayList<>(5);
     @JsonIgnore
     private Api api;
     @JsonIgnore
@@ -28,6 +26,8 @@ public class WrapperApi {
     @JsonIgnore
     private List<MimeType> mediaTypes;
     private List<String> protocols;
+    private final List<WrapperSecurityScheme> secureBy = new ArrayList<>(5);
+    private final List<WrapperSecurityScheme> securitySchemes = new ArrayList<>(5);
     private String description;
     private String baseUrl;
 
