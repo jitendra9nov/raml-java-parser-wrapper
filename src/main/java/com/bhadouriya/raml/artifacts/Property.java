@@ -38,75 +38,75 @@ public class Property {
     }
 
     public BeanObject getBeanObject() {
-        return beanObject;
+        return this.beanObject;
     }
 
     public String getDefaultValue() {
-        return defaultValue;
+        return this.defaultValue;
     }
 
     public List<String> getDependencies() {
-        return dependencies;
+        return this.dependencies;
     }
 
     public String getDescription() {
-        return description;
+        return this.description;
     }
 
     public List<?> getEnumValues() {
-        return enumValues;
+        return this.enumValues;
     }
 
     public String getExample() {
-        return example;
+        return this.example;
     }
 
     public List<String> getExamples() {
-        return examples;
+        return this.examples;
     }
 
     public String getFormat() {
-        return format;
+        return this.format;
     }
 
     public Property getItems() {
-        return items;
+        return this.items;
     }
 
     public Number getMax() {
-        return max;
+        return this.max;
     }
 
     public Number getMin() {
-        return min;
+        return this.min;
     }
 
     public Double getMultipleOf() {
-        return multipleOf;
+        return this.multipleOf;
     }
 
     public String getName() {
-        return name;
+        return this.name;
     }
 
     public boolean isRequired() {
-        return required;
+        return this.required;
     }
 
     public String getSchemeContnt() {
-        return schemeContnt;
+        return this.schemeContnt;
     }
 
     public String getType() {
-        return type;
+        return this.type;
     }
 
     public boolean isUniqueItems() {
-        return uniqueItems;
+        return this.uniqueItems;
     }
 
     public String getValue() {
-        return value;
+        return this.value;
     }
 
     public void setBeanObject(BeanObject beanObject) {
@@ -179,7 +179,7 @@ public class Property {
 
     public void setBean(final BeanObject beanObject) {
         if (null != beanObject) {
-            dependencies.add(beanObject.getName());
+            this.dependencies.add(beanObject.getName());
         }
         this.beanObject = beanObject;
     }

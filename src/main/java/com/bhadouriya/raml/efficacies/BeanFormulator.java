@@ -23,16 +23,23 @@ public class BeanFormulator {
             type = "array";
         }
         final Property prop = new Property(td.name(), td.type());
+
         if (null != td.items()) {
             final Property items = handleTypes(td.items(), td.name());
             prop.setBean(items.getBeanObject());
             prop.setItems(items);
 
             if (null == items.getExample()) {
-                setExample(td, items);
+                String example = isNull(td.example()) ? null : td.example().value();
+                if (!isNull(example) && example.startsWith("[") && example.endsWith("]")) {
+                    example = example.substring(1, example.length() - 1).replaceAll("\\s+", "");
+                    example = example.replaceAll("\"", "").split(",")[0];
+                }
+                items.setExample(example);
             }
+
             if (isEmpty(items.getExamples()) && !isEmpty(td.examples())) {
-                final List<String> examples = new ArrayList<>();
+                final List<String> examples = new ArrayList<>(5);
                 td.examples().forEach(ex -> {
                     examples.add(ex.value());
                 });
@@ -76,6 +83,7 @@ public class BeanFormulator {
         final Property prop = new Property(td.name(), td.type());
         prop.setMax(td.maxLength());
         prop.setMin(td.minLength());
+        prop.setEnumValues(td.fileTypes());
         return prop;
     }
 
@@ -96,7 +104,7 @@ public class BeanFormulator {
     private static Property handleObjectType(ObjectTypeDeclaration td, BeanObject bn) {
         bn.setAdditionalProperties(td.additionalProperties());
         bn.setDiscriminator(td.discriminator());
-        bn.setDefaultValue(td.discriminatorValue());
+        bn.setDiscriminatorValue(td.discriminatorValue());
         bn.setMaxProperties(td.maxProperties());
         bn.setMinProperties(td.minProperties());
 
@@ -140,7 +148,7 @@ public class BeanFormulator {
         return new Property(td.name(), td.type());
     }
 
-    private static Property handleTypes(TypeDeclaration td, String name) {
+    public static Property handleTypes(TypeDeclaration td, String name) {
         Property prop = null;
         if (td instanceof ObjectTypeDeclaration) {
             String beanName = name;
@@ -184,24 +192,25 @@ public class BeanFormulator {
             prop.setDefaultValue(td.defaultValue());
             prop.setRequired(Boolean.TRUE.equals(td.required()));
 
-            setExample(td, prop);
-            final List<String> examples = new ArrayList<>();
-            td.examples().forEach(ex -> {
-                examples.add(ex.value());
-            });
-            prop.setExamples(examples);
+            String example = isNull(td.example()) ? null : td.example().value();
+            if (!isNull(example) && example.startsWith("[") && example.endsWith("]")) {
+                example = example.substring(1, example.length() - 1).replaceAll("\\s+", "");
+            }
+
+            prop.setExample(example);
+
+            if (!isEmpty(td.examples())) {
+                final List<String> examples = new ArrayList<>(5);
+                td.examples().forEach(ex -> {
+                    examples.add(ex.value());
+                });
+                prop.setExamples(examples);
+            }
+
         }
         return prop;
     }
 
-    private static void setExample(TypeDeclaration td, Property prop) {
-        String example = isNull(td.example()) ? null : td.example().value();
-        if (!isNull(example) && example.startsWith("[") && example.endsWith("]")) {
-            example = example.substring(1, example.length() - 1).replaceAll("\\s+", "");
-            example = example.replaceAll("\"", "").split(",")[0];
-        }
-        prop.setExample(example);
-    }
 
     public static BeanObject toBean(final TypeDeclaration td) {
         final BeanObject bn = new BeanObject(td.type());
@@ -213,6 +222,5 @@ public class BeanFormulator {
         }
         return bn;
     }
-
 
 }

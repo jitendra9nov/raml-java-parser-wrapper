@@ -34,55 +34,55 @@ public class BeanObject {
     }
 
     public boolean isAdditionalProperties() {
-        return additionalProperties;
+        return this.additionalProperties;
     }
 
     public String getDefaultValue() {
-        return defaultValue;
+        return this.defaultValue;
     }
 
     public List<String> getDependencies() {
-        return dependencies;
+        return this.dependencies;
     }
 
     public String getDescription() {
-        return description;
+        return this.description;
     }
 
     public String getDiscriminator() {
-        return discriminator;
+        return this.discriminator;
     }
 
     public String getDiscriminatorValue() {
-        return discriminatorValue;
+        return this.discriminatorValue;
     }
 
     public String getExample() {
-        return example;
+        return this.example;
     }
 
     public List<String> getExamples() {
-        return examples;
+        return this.examples;
     }
 
     public Number getMaxProperties() {
-        return maxProperties;
+        return this.maxProperties;
     }
 
     public Number getMinProperties() {
-        return minProperties;
+        return this.minProperties;
     }
 
     public String getName() {
-        return name;
+        return this.name;
     }
 
     public List<Property> getProperties() {
-        return properties;
+        return this.properties;
     }
 
     public boolean isRequired() {
-        return required;
+        return this.required;
     }
 
     public void setAdditionalProperties(boolean additionalProperties) {
@@ -126,12 +126,12 @@ public class BeanObject {
     }
 
     public Property getProperty(final String propName) {
-        return properties.stream().filter(prop -> prop.getName().equals(propName)).findAny().orElse(null);
+        return this.properties.stream().filter(prop -> prop.getName().equals(propName)).findAny().orElse(null);
     }
 
     public void putProperty(final Property prop) {
-        properties.add(prop);
-        dependencies.addAll(prop.getDependencies());
+        this.properties.add(prop);
+        this.dependencies.addAll(prop.getDependencies());
     }
 
 }

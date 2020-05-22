@@ -19,6 +19,8 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class WrapperApi {
     private final List<WrapperResource> wrapperResources = new ArrayList<>(5);
+    private final List<WrapperSecurityScheme> wrapperSecureBy = new ArrayList<>(5);
+    private final List<WrapperSecurityScheme> wrapperSecuritySchemes = new ArrayList<>(5);
     @JsonIgnore
     private Api api;
     @JsonIgnore
@@ -26,8 +28,6 @@ public class WrapperApi {
     @JsonIgnore
     private List<MimeType> mediaTypes;
     private List<String> protocols;
-    private final List<WrapperSecurityScheme> secureBy = new ArrayList<>(5);
-    private final List<WrapperSecurityScheme> securitySchemes = new ArrayList<>(5);
     private String description;
     private String baseUrl;
 
@@ -39,43 +39,101 @@ public class WrapperApi {
 
     public WrapperApi(Api api) {
         this.api = api;
-        allotApi();
+        this.allotApi();
     }
 
     private void allotApi() {
-        baseUrl = isNull(api.baseUri()) ? "" : api.baseUri().value();
-        mediaTypes = api.mediaType();
-        protocols = api.protocols();
-        title = isNull(api.title()) ? "" : api.title().value();
-        version = isNull(api.version()) ? "" : api.version().value();
-        documentation = api.documentation();
-        description = isNull(api.description()) ? "" : api.description().value();
-        allotSecurity();
-        resourceIterator(api.resources(), null, null);
+        this.baseUrl = isNull(this.api.baseUri()) ? "" : this.api.baseUri().value();
+        this.mediaTypes = this.api.mediaType();
+        this.protocols = this.api.protocols();
+        this.title = isNull(this.api.title()) ? "" : this.api.title().value();
+        this.version = isNull(this.api.version()) ? "" : this.api.version().value();
+        this.documentation = this.api.documentation();
+        this.description = isNull(this.api.description()) ? "" : this.api.description().value();
+        this.allotSecurity();
+        this.resourceIterator(this.api.resources(), null, null);
 
     }
 
     private void allotSecurity() {
-        if (!isEmpty(api.securitySchemes())) {
-            api.securitySchemes().forEach(ss -> {
-                securitySchemes.add(new WrapperSecurityScheme(ss));
+        if (!isEmpty(this.api.securitySchemes())) {
+            this.api.securitySchemes().forEach(ss -> {
+                this.wrapperSecuritySchemes.add(new WrapperSecurityScheme(ss));
             });
         }
-        if (!isEmpty(api.securedBy())) {
-            api.securedBy().forEach(ssr -> {
+        if (!isEmpty(this.api.securedBy())) {
+            this.api.securedBy().forEach(ssr -> {
                 if (!isNull(ssr.securityScheme())) {
-                    securitySchemes.add(new WrapperSecurityScheme(ssr.securityScheme()));
+                    this.wrapperSecureBy.add(new WrapperSecurityScheme(ssr.securityScheme()));
                 }
 
             });
         }
     }
 
-    private void resourceIterator(List<Resource> resources, List<TypeDeclaration> uriParam, List<WrapperResource> wrapperResources) {
+    private void resourceIterator(final List<Resource> resources, final List<TypeDeclaration> uriParam, final List<WrapperResource> wrapperResources) {
         if (!isEmpty(resources)) {
-            resources.forEach(resource -> {
-                //List<WrapperResource> wrapperResourcesLoc =
-            });
+            for (final Resource resource : resources) {
+                List<WrapperResource> wrapperResourcesLoc = wrapperResources;
+                try {
+                    final WrapperResource wRes = new WrapperResource(resource, uriParam);
+
+                    if (null == wrapperResources) {
+                        this.wrapperResources.add(wRes);
+                        wrapperResourcesLoc = wRes.getChildWrapperResources();
+                    } else {
+                        wrapperResourcesLoc.add(wRes);
+                    }
+                } catch (final IllegalStateException ex) {
+                    this.resourceIterator(resource.resources(), resource.uriParameters(), wrapperResourcesLoc);
+                    continue;
+                }
+            }
+
         }
+    }
+
+    public List<WrapperResource> getWrapperResources() {
+        return this.wrapperResources;
+    }
+
+    public List<WrapperSecurityScheme> getWrapperSecureBy() {
+        return this.wrapperSecureBy;
+    }
+
+    public List<WrapperSecurityScheme> getWrapperSecuritySchemes() {
+        return this.wrapperSecuritySchemes;
+    }
+
+    public Api getApi() {
+        return this.api;
+    }
+
+    public List<DocumentationItem> getDocumentation() {
+        return this.documentation;
+    }
+
+    public List<MimeType> getMediaTypes() {
+        return this.mediaTypes;
+    }
+
+    public List<String> getProtocols() {
+        return this.protocols;
+    }
+
+    public String getDescription() {
+        return this.description;
+    }
+
+    public String getBaseUrl() {
+        return this.baseUrl;
+    }
+
+    public String getTitle() {
+        return this.title;
+    }
+
+    public String getVersion() {
+        return this.version;
     }
 }

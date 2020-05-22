@@ -6,6 +6,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import org.raml.v2.api.model.v10.security.SecurityScheme;
 import org.raml.v2.api.model.v10.security.SecuritySchemePart;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class WrapperSecurityScheme {
@@ -16,10 +19,10 @@ public class WrapperSecurityScheme {
     private SecuritySchemePart describerBy;
 
 
-    //private List<String> protocols;
-    //private List<WrapperSecurityScheme> secureBy=new ArrayList<>(5);
-    //private List<WrapperSecurityScheme> secureBy=new ArrayList<>(5);
-    //private List<WrapperSecurityScheme> secureBy=new ArrayList<>(5);
+    private final List<WrapperType> headers = new ArrayList<>(5);
+    private final List<WrapperType> queryParams = new ArrayList<>(5);
+    private final List<WrapperType> secureBy = new ArrayList<>(5);
+    private List<String> protocols;
 
     private String description;
     private String type;
