@@ -49,11 +49,11 @@ public class WrapperRequest {
             this.example = exampleLoc;
 
             if (!isEmpty(td.examples())) {
-                final List<String> LocExamples = new ArrayList<>(5);
+                final List<String> locExamples = new ArrayList<>(5);
                 td.examples().forEach(ex -> {
-                    LocExamples.add(ex.value());
+                    locExamples.add(ex.value());
                 });
-                this.examples = LocExamples;
+                this.examples = locExamples;
             }
             this.beanObject = toBean(td);
         });

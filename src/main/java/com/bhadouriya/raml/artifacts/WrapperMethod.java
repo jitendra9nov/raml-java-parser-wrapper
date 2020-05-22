@@ -17,9 +17,9 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class WrapperMethod {
 
-    private final List<WrapperType> headers = new ArrayList<>(5);
-    private final List<WrapperType> queryParams = new ArrayList<>(5);
-    private final List<WrapperResponse> responses = new ArrayList<>(5);
+    private final List<WrapperType> wrapperHeaders = new ArrayList<>(5);
+    private final List<WrapperType> wrapperQueryParams = new ArrayList<>(5);
+    private final List<WrapperResponse> wrapperResponses = new ArrayList<>(5);
     private final List<RuleSet> ruleSet = new ArrayList<>(5);
     private WrapperRequest wrapperRequest;
     private String description;
@@ -49,35 +49,39 @@ public class WrapperMethod {
         }
         if (!isEmpty(this.method.responses())) {
             this.method.responses().forEach(resp -> {
-                this.responses.add(new WrapperResponse(resp));
+                this.wrapperResponses.add(new WrapperResponse(resp));
             });
         }
         if (!isEmpty(this.method.headers())) {
             this.method.headers().forEach(header -> {
-                this.headers.add(new WrapperType(header));
+                this.wrapperHeaders.add(new WrapperType(header));
             });
         }
         if (!isEmpty(this.method.queryParameters())) {
             this.method.queryParameters().forEach(parm -> {
-                this.queryParams.add(new WrapperType(parm));
+                this.wrapperQueryParams.add(new WrapperType(parm));
             });
         }
     }
 
-    public List<WrapperType> getHeaders() {
-        return this.headers;
+    public List<WrapperType> getWrapperHeaders() {
+        return this.wrapperHeaders;
     }
 
-    public List<WrapperType> getQueryParams() {
-        return this.queryParams;
+    public List<WrapperType> getWrapperQueryParams() {
+        return this.wrapperQueryParams;
+    }
+
+    public List<WrapperResponse> getWrapperResponses() {
+        return this.wrapperResponses;
+    }
+
+    public List<RuleSet> getRuleSet() {
+        return this.ruleSet;
     }
 
     public WrapperRequest getWrapperRequest() {
         return this.wrapperRequest;
-    }
-
-    public List<WrapperResponse> getResponses() {
-        return this.responses;
     }
 
     public String getDescription() {
@@ -92,7 +96,7 @@ public class WrapperMethod {
         return this.requestJsonPath;
     }
 
-    public void setRequestJsonPath(Map<String, RamlAttribute> requestJsonPath) {
+    public void setRequestJsonPath(final Map<String, RamlAttribute> requestJsonPath) {
         this.requestJsonPath = requestJsonPath;
     }
 
@@ -100,7 +104,7 @@ public class WrapperMethod {
         return this.requestSample;
     }
 
-    public void setRequestSample(String requestSample) {
+    public void setRequestSample(final String requestSample) {
         this.requestSample = requestSample;
     }
 
@@ -108,7 +112,7 @@ public class WrapperMethod {
         return this.responseCodes;
     }
 
-    public void setResponseCodes(Map<Integer, String> responseCodes) {
+    public void setResponseCodes(final Map<Integer, String> responseCodes) {
         this.responseCodes = responseCodes;
     }
 
@@ -116,19 +120,15 @@ public class WrapperMethod {
         return this.responseSamples;
     }
 
-    public void setResponseSamples(Map<Integer, String> responseSamples) {
+    public void setResponseSamples(final Map<Integer, String> responseSamples) {
         this.responseSamples = responseSamples;
-    }
-
-    public List<RuleSet> getRuleSet() {
-        return this.ruleSet;
     }
 
     public Integer getSuccessCode() {
         return this.successCode;
     }
 
-    public void setSuccessCode(Integer successCode) {
+    public void setSuccessCode(final Integer successCode) {
         this.successCode = successCode;
     }
 

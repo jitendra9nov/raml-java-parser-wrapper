@@ -17,7 +17,7 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class WrapperResponse {
-    private final List<WrapperType> headers = new ArrayList<>(5);
+    private final List<WrapperType> wrapperHeaders = new ArrayList<>(5);
     private BeanObject beanObject;
     @JsonIgnore
     private List<TypeDeclaration> body;
@@ -48,7 +48,7 @@ public class WrapperResponse {
 
         if (!isEmpty(this.response.headers())) {
             this.response.headers().forEach(header -> {
-                this.headers.add(new WrapperType(header));
+                this.wrapperHeaders.add(new WrapperType(header));
             });
         }
         this.body.forEach(td -> {
@@ -98,8 +98,8 @@ public class WrapperResponse {
         return this.examples;
     }
 
-    public List<WrapperType> getHeaders() {
-        return this.headers;
+    public List<WrapperType> getWrapperHeaders() {
+        return this.wrapperHeaders;
     }
 
     public String getMediaType() {

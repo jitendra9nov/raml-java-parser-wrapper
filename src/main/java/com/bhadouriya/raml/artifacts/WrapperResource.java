@@ -35,12 +35,12 @@ public class WrapperResource {
                 this.wrapperUriParams.add(new WrapperType(uriParam));
             });
         }
-        this.allotResourc();
+        this.allotResource();
     }
 
-    private void allotResourc() {
+    private void allotResource() {
         this.name = capatalizeAndAppend(isNull(this.resource.displayName()) ? "" : this.resource.displayName().value());
-        this.description = capatalizeAndAppend(isNull(this.resource.description()) ? "" : this.resource.description().value());
+        this.description = isNull(this.resource.description()) ? "" : this.resource.description().value();
         this.path = this.resource.resourcePath();
         if (!isEmpty(this.resource.uriParameters())) {
             this.resource.uriParameters().forEach(param -> {
