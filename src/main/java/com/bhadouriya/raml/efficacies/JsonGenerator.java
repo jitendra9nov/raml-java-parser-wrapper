@@ -30,8 +30,8 @@ public class JsonGenerator {
     private static final Random random = new Random(1234567890);
     private static final int count = 1;
     private static final String defaultPattern = "[a-zA-Z0-9-. /'&90@#=\"_]";
-    private static String PATH = "..\\" + fs + "resources";
     private static final int maxLength = 18;
+    private static String PATH = "..\\" + fs + "resources";
     private static int minLength;
     private static boolean isMaxList;
     private static boolean isRandom;
@@ -66,7 +66,7 @@ public class JsonGenerator {
     }
 
     static {
-        Map<String, String> characterClasse = new HashMap<>();
+        final Map<String, String> characterClasse = new HashMap<>();
         characterClasse.put("\\\\d", "0-9");
         characterClasse.put("\\\\D", "^0-9");
         characterClasse.put("\\\\s", " \t\n\f\r");
@@ -77,17 +77,17 @@ public class JsonGenerator {
         PREDEFINED_CHARACTER_CLASSES = Collections.unmodifiableMap(characterClasse);
     }
 
-    private static void addHeaders(WrapperMethod wm) {
+    private static void addHeaders(final WrapperMethod wm) {
         if (!isEmpty(wm.getWrapperHeaders())) {
             getSeperationAttribute(wm, "---REQUEST HEADERS---");
             wm.getWrapperHeaders().forEach(header -> {
-                Property prop = header.getProperty();
-                String type = prop.getType();
-                String jsonPathLocal = prop.getName();
+                final Property prop = header.getProperty();
+                final String type = prop.getType();
+                final String jsonPathLocal = prop.getName();
 
-                Class<?> fieldType = convertToJavaClass(type, prop.getFormat());
+                final Class<?> fieldType = convertToJavaClass(type, prop.getFormat());
 
-                RamlAttribute ramlAttribute = new RamlAttribute(jsonPathLocal, jsonPathLocal, type, prop.isRequired());
+                final RamlAttribute ramlAttribute = new RamlAttribute(jsonPathLocal, jsonPathLocal, type, prop.isRequired());
                 ramlAttribute.setInput(getInput(prop, fieldType, fieldType.getName()));
                 ramlAttribute.setOperators(getOperators(ramlAttribute.getInput().getDataType(),
                         ramlAttribute.getInput().getChildType(), prop.isRequired()));
@@ -96,21 +96,21 @@ public class JsonGenerator {
         }
     }
 
-    private static void addHSecurityHeaders(final WrapperApi wrapperApi, WrapperMethod wm) {
+    private static void addHSecurityHeaders(WrapperApi wrapperApi, final WrapperMethod wm) {
         if (!isEmpty(wrapperApi.getWrapperSecureBy())) {
             getSeperationAttribute(wm, "---REQUEST HEADERS---");
             wrapperApi.getWrapperSecureBy().forEach(secure -> {
-                final List<WrapperType> headers = secure.getWrapperHeaders();
+                List<WrapperType> headers = secure.getWrapperHeaders();
 
                 if (!isEmpty(headers)) {
                     headers.forEach(header -> {
-                        Property prop = header.getProperty();
-                        String type = prop.getType();
-                        String jsonPathLocal = prop.getName();
+                        final Property prop = header.getProperty();
+                        final String type = prop.getType();
+                        final String jsonPathLocal = prop.getName();
 
-                        Class<?> fieldType = convertToJavaClass(type, prop.getFormat());
+                        final Class<?> fieldType = convertToJavaClass(type, prop.getFormat());
 
-                        RamlAttribute ramlAttribute = new RamlAttribute(jsonPathLocal, jsonPathLocal, type, prop.isRequired());
+                        final RamlAttribute ramlAttribute = new RamlAttribute(jsonPathLocal, jsonPathLocal, type, prop.isRequired());
                         ramlAttribute.setInput(getInput(prop, fieldType, fieldType.getName()));
                         ramlAttribute.setOperators(getOperators(ramlAttribute.getInput().getDataType(),
                                 ramlAttribute.getInput().getChildType(), prop.isRequired()));
@@ -122,17 +122,17 @@ public class JsonGenerator {
         }
     }
 
-    private static void addQuryParams(WrapperMethod wm) {
+    private static void addQuryParams(final WrapperMethod wm) {
         if (!isEmpty(wm.getWrapperQueryParams())) {
             getSeperationAttribute(wm, "---QUERY PARAMETERS---");
             wm.getWrapperQueryParams().forEach(params -> {
-                Property prop = params.getProperty();
-                String type = prop.getType();
-                String jsonPathLocal = prop.getName();
+                final Property prop = params.getProperty();
+                final String type = prop.getType();
+                final String jsonPathLocal = prop.getName();
 
-                Class<?> fieldType = convertToJavaClass(type, prop.getFormat());
+                final Class<?> fieldType = convertToJavaClass(type, prop.getFormat());
 
-                RamlAttribute ramlAttribute = new RamlAttribute(jsonPathLocal, jsonPathLocal, type, prop.isRequired());
+                final RamlAttribute ramlAttribute = new RamlAttribute(jsonPathLocal, jsonPathLocal, type, prop.isRequired());
                 ramlAttribute.setInput(getInput(prop, fieldType, fieldType.getName()));
                 ramlAttribute.setOperators(getOperators(ramlAttribute.getInput().getDataType(),
                         ramlAttribute.getInput().getChildType(), prop.isRequired()));
@@ -141,17 +141,17 @@ public class JsonGenerator {
         }
     }
 
-    private static void addUrlParams(final WrapperResource wres, WrapperMethod wm) {
+    private static void addUrlParams(WrapperResource wres, final WrapperMethod wm) {
         if (!isEmpty(wres.getWrapperUriParams())) {
             getSeperationAttribute(wm, "---QUERY PARAMETERS---");
             wres.getWrapperUriParams().forEach(params -> {
-                Property prop = params.getProperty();
-                String type = prop.getType();
-                String jsonPathLocal = prop.getName();
+                final Property prop = params.getProperty();
+                final String type = prop.getType();
+                final String jsonPathLocal = prop.getName();
 
-                Class<?> fieldType = convertToJavaClass(type, prop.getFormat());
+                final Class<?> fieldType = convertToJavaClass(type, prop.getFormat());
 
-                RamlAttribute ramlAttribute = new RamlAttribute(jsonPathLocal, jsonPathLocal, type, prop.isRequired());
+                final RamlAttribute ramlAttribute = new RamlAttribute(jsonPathLocal, jsonPathLocal, type, prop.isRequired());
                 ramlAttribute.setInput(getInput(prop, fieldType, fieldType.getName()));
                 ramlAttribute.setOperators(getOperators(ramlAttribute.getInput().getDataType(),
                         ramlAttribute.getInput().getChildType(), prop.isRequired()));
@@ -160,38 +160,38 @@ public class JsonGenerator {
         }
     }
 
-    private static void addRequestBody(WrapperApi wapi, final WrapperMethod wm, final boolean isPrint) {
+    private static void addRequestBody(final WrapperApi wapi, WrapperMethod wm, boolean isPrint) {
         if (null != wm.getWrapperRequest() && null != wm.getWrapperRequest().getBeanObject()) {
             getSeperationAttribute(wm, "---REQUEST ATTRIBUTES---");
             try {
                 for (int i = 0; i < count; i++) {
-                    int ind = i;
-                    BeanObject parent = wm.getWrapperRequest().getBeanObject();
-                    final String examples = !isEmpty(wm.getWrapperRequest().getExamples()) ? wm.getWrapperRequest().getExamples().get(0) : null;
-                    final String example = !isEmpty(wm.getWrapperRequest().getExample()) ? wm.getWrapperRequest().getExample() : null;
-                    String requestSample = forAllFields(wapi, parent, wm, ind, true, example, isPrint);
+                    final int ind = i;
+                    final BeanObject parent = wm.getWrapperRequest().getBeanObject();
+                    String examples = !isEmpty(wm.getWrapperRequest().getExamples()) ? wm.getWrapperRequest().getExamples().get(0) : null;
+                    String example = !isEmpty(wm.getWrapperRequest().getExample()) ? wm.getWrapperRequest().getExample() : null;
+                    final String requestSample = forAllFields(wapi, parent, wm, ind, true, example, isPrint);
                     wm.setRequestSample(requestSample);
                 }
-            } catch (final Exception e) {
+            } catch (Exception e) {
                 LOGGER.log(Level.SEVERE, "Exception while generating request", e);
             }
         }
     }
 
-    private static void buildJsonResponse(WrapperApi wapi, final WrapperMethod wm, final WrapperResponse wrsp, final int httpStatus, final boolean isPrint) {
+    private static void buildJsonResponse(final WrapperApi wapi, WrapperMethod wm, WrapperResponse wrsp, int httpStatus, boolean isPrint) {
         if (HttpStatus.valueOf(httpStatus).is2xxSuccessful()) {
             for (int i = 0; i < count; i++) {
-                int ind = i;
-                final String examples = !isEmpty(wrsp.getExamples()) ? wrsp.getExamples().get(0) : null;
-                final String example = !isEmpty(wrsp.getExample()) ? wrsp.getExample() : null;
-                String responseSample = forAllFields(wapi, wrsp.getBeanObject(), wm, ind, false, example, isPrint);
+                final int ind = i;
+                String examples = !isEmpty(wrsp.getExamples()) ? wrsp.getExamples().get(0) : null;
+                String example = !isEmpty(wrsp.getExample()) ? wrsp.getExample() : null;
+                final String responseSample = forAllFields(wapi, wrsp.getBeanObject(), wm, ind, false, example, isPrint);
                 wm.getResponseSamples().put(httpStatus, responseSample);
             }
 
         }
     }
 
-    private static void buildRequestJson(WrapperApi wapi, final WrapperResource wres, final boolean isPrint) {
+    private static void buildRequestJson(final WrapperApi wapi, WrapperResource wres, boolean isPrint) {
         wres.getWrapperMethods().forEach(wm -> {
             addHSecurityHeaders(wapi, wm);
             addHeaders(wm);
@@ -201,40 +201,40 @@ public class JsonGenerator {
         });
     }
 
-    private static void buildResponseJson(WrapperApi wapi, final WrapperResource wres, final boolean isPrint) {
+    private static void buildResponseJson(final WrapperApi wapi, WrapperResource wres, boolean isPrint) {
         wres.getWrapperMethods().forEach(wm -> {
             try {
                 wm.getWrapperResponses().forEach(rspns -> {
-                    int httpStatus = NumberUtils.toInt(rspns.getCode(), 500);
+                    final int httpStatus = NumberUtils.toInt(rspns.getCode(), 500);
                     buildJsonResponse(wapi, wm, rspns, httpStatus, isPrint);
                     wm.getResponseCodes().put(httpStatus, rspns.getCode() + "-" + HttpStatus.valueOf(httpStatus).getReasonPhrase());
                 });
-            } catch (final Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         });
     }
 
-    private static String byteValue(Property prop) {
-        String value;
+    private static String byteValue(final Property prop) {
+        final String value;
         if (!isEmpty(prop.getEnumValues())) {
             int index = prop.getEnumValues().size() - 1;
             index = (int) ((Math.random() * ((index - 0) + 1)) + 0);
             value = prop.getEnumValues().get(index).toString();
         } else {
-            final byte min = null != prop.getMin() ? prop.getMin().byteValue() : Byte.MIN_VALUE;
-            final byte max = null != prop.getMax() ? prop.getMax().byteValue() : Byte.MAX_VALUE;
-            final double multipleOf = null != prop.getMultipleOf() ? prop.getMultipleOf().doubleValue() : 1;
+            byte min = null != prop.getMin() ? prop.getMin().byteValue() : Byte.MIN_VALUE;
+            byte max = null != prop.getMax() ? prop.getMax().byteValue() : Byte.MAX_VALUE;
+            double multipleOf = null != prop.getMultipleOf() ? prop.getMultipleOf().doubleValue() : 1;
 
-            final int range = (int) ((max - min) / multipleOf);
+            int range = (int) ((max - min) / multipleOf);
 
-            byte values = (byte) (min + (random.nextInt(range) * multipleOf));
+            final byte values = (byte) (min + (random.nextInt(range) * multipleOf));
             value = String.valueOf(values);
         }
         return value;
     }
 
-    private static Class<?> convertToJavaClass(final String type, final String format) {
+    private static Class<?> convertToJavaClass(String type, String format) {
         String arrayName = type;
         if (isEmpty(arrayName)) {
             return Object.class;
@@ -268,7 +268,7 @@ public class JsonGenerator {
             //No primitive, try to load it from given classloader
             try {
                 clazz = Class.forName("java.lang." + capitalize(arrayName));
-            } catch (ClassNotFoundException e) {
+            } catch (final ClassNotFoundException e) {
                 LOGGER.log(Level.SEVERE, "Error While Generating Json", e);
             }
         }
@@ -276,7 +276,7 @@ public class JsonGenerator {
             //No primitive, try to load it from given classloader
             try {
                 clazz = Class.forName("java.util." + capitalize(arrayName));
-            } catch (ClassNotFoundException e) {
+            } catch (final ClassNotFoundException e) {
                 LOGGER.log(Level.SEVERE, "Error While Generating Json", e);
             }
         }
@@ -286,17 +286,17 @@ public class JsonGenerator {
         return clazz;
     }
 
-    private static void createJon(WrapperApi wrapperApi, BeanObject parent, JSONObject jsonObject, boolean isMandatory, String jsonPathRoot, WrapperMethod wrapperMethod) {
-        List<Property> properties = parent.getProperties();
+    private static void createJon(final WrapperApi wrapperApi, final BeanObject parent, final JSONObject jsonObject, final boolean isMandatory, final String jsonPathRoot, final WrapperMethod wrapperMethod) {
+        final List<Property> properties = parent.getProperties();
 
-        for (Property prop : properties
+        for (final Property prop : properties
         ) {
             if (isMandatory && !prop.isRequired()) {
                 continue;
             }
-            String type = prop.getType();
-            String jsonPathLocal = jsonPathRoot;
-            String propName = prop.getName();
+            final String type = prop.getType();
+            final String jsonPathLocal = jsonPathRoot;
+            final String propName = prop.getName();
             switch (type) {
                 case "array":
                     handleArray(wrapperApi, jsonObject, isMandatory, wrapperMethod, prop, jsonPathLocal, propName);
@@ -312,7 +312,7 @@ public class JsonGenerator {
         }
     }
 
-    private static void createJsonSchemas(WrapperApi wrapperApi, boolean isPrint) {
+    private static void createJsonSchemas(final WrapperApi wrapperApi, final boolean isPrint) {
         wrapperApi.getWrapperResources().forEach(res -> {
             buildRequestJson(wrapperApi, res, isPrint);
             buildResponseJson(wrapperApi, res, isPrint);
@@ -327,7 +327,7 @@ public class JsonGenerator {
         }
     }
 
-    private static void createJsonSchemas(WrapperApi wrapperApi, boolean isRandomArg, boolean isMaxListArg, String resources, boolean isPrint) {
+    private static void createJsonSchemas(final WrapperApi wrapperApi, final boolean isRandomArg, final boolean isMaxListArg, final String resources, final boolean isPrint) {
 
         isMaxList = isMaxListArg;
         isRandom = isRandomArg;
@@ -335,12 +335,12 @@ public class JsonGenerator {
 
         try {
             createJsonSchemas(wrapperApi, isPrint);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             LOGGER.log(Level.SEVERE, "Error while generating Json", e);
         }
     }
 
-    private static String dateValue(Property prop) {
+    private static String dateValue(final Property prop) {
         String value;
         String format = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'";
         switch (prop.getType()) {
@@ -362,72 +362,72 @@ public class JsonGenerator {
         return getCurrentDate(format);
     }
 
-    private static String doubleValue(Property prop) {
-        String value;
+    private static String doubleValue(final Property prop) {
+        final String value;
         if (!isEmpty(prop.getEnumValues())) {
             int index = prop.getEnumValues().size() - 1;
             index = (int) ((Math.random() * ((index - 0) + 1)) + 0);
             value = prop.getEnumValues().get(index).toString();
         } else {
-            final double min = null != prop.getMin() ? prop.getMin().doubleValue() : Double.MIN_VALUE;
-            final double max = null != prop.getMax() ? prop.getMax().doubleValue() : Double.MAX_VALUE;
-            final double multipleOf = null != prop.getMultipleOf() ? prop.getMultipleOf().doubleValue() : 1;
+            double min = null != prop.getMin() ? prop.getMin().doubleValue() : Double.MIN_VALUE;
+            double max = null != prop.getMax() ? prop.getMax().doubleValue() : Double.MAX_VALUE;
+            double multipleOf = null != prop.getMultipleOf() ? prop.getMultipleOf().doubleValue() : 1;
 
-            final int range = (int) ((max - min) / multipleOf);
+            int range = (int) ((max - min) / multipleOf);
 
-            double values = (min + (random.nextInt(range) * multipleOf));
+            final double values = (min + (random.nextInt(range) * multipleOf));
             value = String.valueOf(values);
         }
         return value;
     }
 
-    private static String floatValue(Property prop) {
-        String value;
+    private static String floatValue(final Property prop) {
+        final String value;
         if (!isEmpty(prop.getEnumValues())) {
             int index = prop.getEnumValues().size() - 1;
             index = (int) ((Math.random() * ((index - 0) + 1)) + 0);
             value = prop.getEnumValues().get(index).toString();
         } else {
-            final float min = null != prop.getMin() ? prop.getMin().floatValue() : Float.MIN_VALUE;
-            final float max = null != prop.getMax() ? prop.getMax().floatValue() : Float.MAX_VALUE;
-            final double multipleOf = null != prop.getMultipleOf() ? prop.getMultipleOf().doubleValue() : 1;
+            float min = null != prop.getMin() ? prop.getMin().floatValue() : Float.MIN_VALUE;
+            float max = null != prop.getMax() ? prop.getMax().floatValue() : Float.MAX_VALUE;
+            double multipleOf = null != prop.getMultipleOf() ? prop.getMultipleOf().doubleValue() : 1;
 
-            final int range = (int) ((max - min) / multipleOf);
+            int range = (int) ((max - min) / multipleOf);
 
-            float values = (float) (min + (random.nextInt(range) * multipleOf));
+            final float values = (float) (min + (random.nextInt(range) * multipleOf));
             value = String.valueOf(values);
         }
         return value;
     }
 
-    private static String forAllFields(final WrapperApi wapi, final BeanObject parent, final WrapperMethod wm, final int ind, final boolean isJsonPath, final String example, final boolean isPrint) {
+    private static String forAllFields(WrapperApi wapi, BeanObject parent, WrapperMethod wm, int ind, boolean isJsonPath, String example, boolean isPrint) {
         String writeJsonSchema = null;
         if (null != parent) {
-            JSONObject jsonRootObj = new JSONObject();
-            String jsonRootPath = isJsonPath ? "$" : null;
+            final JSONObject jsonRootObj = new JSONObject();
+            final String jsonRootPath = isJsonPath ? "$" : null;
             createJon(wapi, parent, jsonRootObj, false, jsonRootPath, wm);
-            String jsonString = isEmpty(example) ? jsonRootObj.toJSONString() : example;
+            final String jsonString = isEmpty(example) ? jsonRootObj.toJSONString() : example;
             writeJsonSchema = writeJsonSchema(parent.getName() + (ind == 0 ? "" : ind), jsonString, PATH + "\\jsons", isPrint);
         }
         return writeJsonSchema;
     }
 
-    private static String getCurrentDate(String format) {
-        Calendar cal = Calendar.getInstance();
+    private static String getCurrentDate(final String format) {
+        final Calendar cal = Calendar.getInstance();
         if (null != format) {
-            SimpleDateFormat sd = new SimpleDateFormat(format);
+            final SimpleDateFormat sd = new SimpleDateFormat(format);
             return sd.format(cal.getTime());
         }
         return cal.getTime().toString();
     }
 
-    private static Input getInput(final Property prop, final Class<?> clazz, final String name) {
-        String dataType = clazz.getSimpleName().toLowerCase();
+    private static Input getInput(Property prop, Class<?> clazz, String name) {
+        final String dataType = clazz.getSimpleName().toLowerCase();
         String type = "text";
         String format = prop.getFormat();
         String errMsg = null;
         String childType = null;
-        List<Config> options = new ArrayList<>();
+        final List<Config> options = new ArrayList<>();
 
         if (String.class == clazz) {
             processEnum(prop, options);
@@ -466,35 +466,35 @@ public class JsonGenerator {
             }
             errMsg = "Not acceptable date pattern.";
         }
-        Input input = new Input(dataType, type, errMsg, format, childType);
+        final Input input = new Input(dataType, type, errMsg, format, childType);
         if (!options.isEmpty()) {
             input.setOptions(options);
         }
         return input;
     }
 
-    private static void processEnum(Property prop, List<Config> options) {
-        String format;
-        String type;
+    private static void processEnum(final Property prop, final List<Config> options) {
+        final String format;
+        final String type;
         if (!isEmpty(prop.getEnumValues())) {
-            StringBuilder format2 = new StringBuilder("(");
+            final StringBuilder format2 = new StringBuilder("(");
             options.add(new Config(null, "--SELECT--"));
             prop.getEnumValues().forEach(enm -> {
                 format2.append(enm + "|");
                 options.add(new Config(String.valueOf(enm), String.valueOf(enm)));
             });
-            int lastIndexOf = format2.lastIndexOf("|");
+            final int lastIndexOf = format2.lastIndexOf("|");
             format = format2.replace(lastIndexOf, lastIndexOf + 1, "").append(")").toString();
             type = "select";
         }
     }
 
-    private static List<Config> getOperators(final String dataType, final String childType, final boolean isMandatory) {
-        List<Config> operators = new ArrayList<>();
+    private static List<Config> getOperators(String dataType, String childType, boolean isMandatory) {
+        final List<Config> operators = new ArrayList<>();
 
-        boolean isString = "string".equalsIgnoreCase(dataType);
-        boolean isNumeric = "number".equalsIgnoreCase(childType);
-        boolean isDateTime = (null != childType && (childType.toLowerCase().contains("date") || childType.toLowerCase().contains("time")));
+        final boolean isString = "string".equalsIgnoreCase(dataType);
+        final boolean isNumeric = "number".equalsIgnoreCase(childType);
+        final boolean isDateTime = (null != childType && (childType.toLowerCase().contains("date") || childType.toLowerCase().contains("time")));
 
         if (!isMandatory) {
             operators.add(new Config("null", "Is Null"));
@@ -535,7 +535,7 @@ public class JsonGenerator {
         return operators;
     }
 
-    private static String getRandomValue(Property prop, Class<?> clazz, String value) {
+    private static String getRandomValue(final Property prop, final Class<?> clazz, String value) {
         if (String.class == clazz) {
             value = stringValue(prop);
         } else if (Boolean.class == clazz) {
@@ -558,31 +558,31 @@ public class JsonGenerator {
         return value;
     }
 
-    private static void getSeperationAttribute(final WrapperMethod wm, final String name) {
-        RamlAttribute seperationAttr = new RamlAttribute(name, name, null, false);
+    private static void getSeperationAttribute(WrapperMethod wm, String name) {
+        final RamlAttribute seperationAttr = new RamlAttribute(name, name, null, false);
         seperationAttr.setInput(new Input());
-        List<Config> operators = new ArrayList<>();
+        final List<Config> operators = new ArrayList<>();
         operators.add(new Config("null", null));
         seperationAttr.setOperators(operators);
         wm.getRequestJsonPath().put(name, seperationAttr);
     }
 
-    private static String getStringRegEx(Property prop) {
+    private static String getStringRegEx(final Property prop) {
         String value;
         String pattern = prop.getFormat();
 
         pattern = null != pattern ? removeEnd(removeStart(pattern, "^"), "$") : null;
 
-        boolean isWhiteSpaceStart = startsWith(pattern, "(?!\\s)");
-        boolean isWhiteSpaceEnd = endsWith(pattern, "(?<!\\s)");
+        final boolean isWhiteSpaceStart = startsWith(pattern, "(?!\\s)");
+        final boolean isWhiteSpaceEnd = endsWith(pattern, "(?<!\\s)");
 
         pattern = null != pattern ? removeEnd(removeStart(pattern, "(?!\\s)"), "(?<!\\s)") : null;
         if (null == pattern) {
-            long minLenFinal = null != prop.getMin() ? prop.getMin().longValue() : minLength;
-            long maxLenFinal = null != prop.getMax() ? prop.getMax().longValue() : maxLength;
+            final long minLenFinal = null != prop.getMin() ? prop.getMin().longValue() : minLength;
+            final long maxLenFinal = null != prop.getMax() ? prop.getMax().longValue() : maxLength;
             pattern = "[a-zA-Z0-9-. /'&()@#=\\\"_]{" + minLenFinal + "," + maxLenFinal + "}";
         }
-        for (Map.Entry<String, String> charClass : PREDEFINED_CHARACTER_CLASSES.entrySet()
+        for (final Map.Entry<String, String> charClass : PREDEFINED_CHARACTER_CLASSES.entrySet()
         ) {
             if (startsWith(pattern, charClass.getKey().replace("\\\\", "\\"))) {
                 pattern = pattern.replaceFirst(charClass.getKey(), "[" + charClass.getValue() + "]");
@@ -590,7 +590,7 @@ public class JsonGenerator {
             pattern = pattern.replaceAll(charClass.getKey(), charClass.getValue());
         }
 
-        Generex generex = new Generex(pattern);
+        final Generex generex = new Generex(pattern);
         value = generex.random(minLength, maxLength);
 
         if (isWhiteSpaceStart) {
@@ -602,7 +602,7 @@ public class JsonGenerator {
         return value;
     }
 
-    private static Object getValue(Property property, Class<?> clazz) {
+    private static Object getValue(final Property property, final Class<?> clazz) {
         String value = clazz.getName();
         if (isRandom) {
             value = getRandomValue(property, clazz, value);
@@ -625,40 +625,40 @@ public class JsonGenerator {
                 value = getRandomValue(property, clazz, value);
             }
         }
-        Constructor<?> constructor;
+        final Constructor<?> constructor;
         try {
             constructor = clazz.getConstructor(String.class);
             return constructor.newInstance(value);
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+        } catch (final InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             LOGGER.warning("Error while generating value");
         }
         return value;
     }
 
-    private static void handleArray(WrapperApi wrapperApi, JSONObject jsonObject, boolean isMandatory, WrapperMethod wrapperMethod, Property prop, String jsonPathLocal, String propName) {
+    private static void handleArray(final WrapperApi wrapperApi, final JSONObject jsonObject, final boolean isMandatory, final WrapperMethod wrapperMethod, final Property prop, String jsonPathLocal, final String propName) {
         Class<?> fieldType;
         if (null != jsonPathLocal) {
             jsonPathLocal += "." + propName + "[*]";
         }
-        BeanObject childArray = prop.getBeanObject();
-        long locMin = prop.getMin().longValue() != 0 ? prop.getMin().longValue() : 1;
-        long min = null != prop.getMin() ? locMin : 1;
-        long locMax = isMaxList ? prop.getMax().longValue() : min;
-        long max = null != prop.getMax() ? locMin : min;
-        JSONArray list = new JSONArray();
+        final BeanObject childArray = prop.getBeanObject();
+        final long locMin = prop.getMin().longValue() != 0 ? prop.getMin().longValue() : 1;
+        final long min = null != prop.getMin() ? locMin : 1;
+        final long locMax = isMaxList ? prop.getMax().longValue() : min;
+        final long max = null != prop.getMax() ? locMin : min;
+        final JSONArray list = new JSONArray();
 
         for (long i = 0; i < max; i++) {
             if (null != childArray) {
-                JSONObject jsonChildObj = new JSONObject();
+                final JSONObject jsonChildObj = new JSONObject();
                 createJon(wrapperApi, childArray, jsonChildObj, isMandatory, jsonPathLocal, wrapperMethod);
                 list.add(jsonChildObj);
             } else {
-                Property items = prop.getItems();
+                final Property items = prop.getItems();
                 fieldType = convertToJavaClass(items.getType(), items.getFormat());
                 list.add(getValue(items, fieldType));
 
                 if (null != jsonPathLocal) {
-                    RamlAttribute ramlAttribute = new RamlAttribute(jsonPathLocal, jsonPathLocal, prop.getType(), prop.isRequired());
+                    final RamlAttribute ramlAttribute = new RamlAttribute(jsonPathLocal, jsonPathLocal, prop.getType(), prop.isRequired());
                     ramlAttribute.setInput(getInput(items, fieldType, fieldType.getName()));
                     ramlAttribute.setOperators(getOperators(ramlAttribute.getInput().getDataType(), ramlAttribute.getInput().getChildType(), prop.isRequired()));
                     wrapperMethod.getRequestJsonPath().put(jsonPathLocal, ramlAttribute);
@@ -668,20 +668,20 @@ public class JsonGenerator {
 
     }
 
-    private static String handleObject(WrapperApi wrapperApi, JSONObject jsonObject, boolean isMandatory, WrapperMethod wrapperMethod, Property prop, String jsonPathLocal, String propName) {
+    private static String handleObject(final WrapperApi wrapperApi, final JSONObject jsonObject, final boolean isMandatory, final WrapperMethod wrapperMethod, final Property prop, String jsonPathLocal, final String propName) {
         if (null != jsonPathLocal) {
             jsonPathLocal += "." + propName;
         }
-        BeanObject childObj = prop.getBeanObject();
-        JSONObject jsonChildObj = new JSONObject();
+        final BeanObject childObj = prop.getBeanObject();
+        final JSONObject jsonChildObj = new JSONObject();
         createJon(wrapperApi, childObj, jsonChildObj, isMandatory, jsonPathLocal, wrapperMethod);
         jsonObject.put(propName, jsonChildObj);
         return jsonPathLocal;
 
     }
 
-    private static void handleType(JSONObject jsonObject, WrapperMethod wrapperMethod, Property prop, String jsonPathLocal, String propName) {
-        Class<?> fieldType;
+    private static void handleType(final JSONObject jsonObject, final WrapperMethod wrapperMethod, final Property prop, String jsonPathLocal, final String propName) {
+        final Class<?> fieldType;
         if (null != jsonPathLocal) {
             jsonPathLocal += "." + propName;
         }
@@ -689,7 +689,7 @@ public class JsonGenerator {
         jsonObject.put(propName, getValue(prop, fieldType));
 
         if (null != jsonPathLocal) {
-            RamlAttribute ramlAttribute = new RamlAttribute(jsonPathLocal, jsonPathLocal, prop.getType(), prop.isRequired());
+            final RamlAttribute ramlAttribute = new RamlAttribute(jsonPathLocal, jsonPathLocal, prop.getType(), prop.isRequired());
             ramlAttribute.setInput(getInput(prop, fieldType, fieldType.getName()));
             ramlAttribute.setOperators(getOperators(ramlAttribute.getInput().getDataType(), ramlAttribute.getInput().getChildType(), prop.isRequired()));
             wrapperMethod.getRequestJsonPath().put(jsonPathLocal, ramlAttribute);
@@ -697,66 +697,66 @@ public class JsonGenerator {
 
     }
 
-    private static String intValue(Property prop) {
-        String value;
+    private static String intValue(final Property prop) {
+        final String value;
         if (!isEmpty(prop.getEnumValues())) {
             int index = prop.getEnumValues().size() - 1;
             index = (int) ((Math.random() * ((index - 0) + 1)) + 0);
             value = prop.getEnumValues().get(index).toString();
         } else {
-            final int min = null != prop.getMin() ? prop.getMin().intValue() : Integer.MIN_VALUE;
-            final int max = null != prop.getMax() ? prop.getMax().intValue() : Integer.MAX_VALUE;
-            final double multipleOf = null != prop.getMultipleOf() ? prop.getMultipleOf().doubleValue() : 1;
+            int min = null != prop.getMin() ? prop.getMin().intValue() : Integer.MIN_VALUE;
+            int max = null != prop.getMax() ? prop.getMax().intValue() : Integer.MAX_VALUE;
+            double multipleOf = null != prop.getMultipleOf() ? prop.getMultipleOf().doubleValue() : 1;
 
-            final int range = (int) ((max - min) / multipleOf);
+            int range = (int) ((max - min) / multipleOf);
 
-            int values = (int) (min + (random.nextInt(range) * multipleOf));
+            final int values = (int) (min + (random.nextInt(range) * multipleOf));
             value = String.valueOf(values);
         }
         return value;
     }
 
-    private static String longValue(Property prop) {
-        String value;
+    private static String longValue(final Property prop) {
+        final String value;
         if (!isEmpty(prop.getEnumValues())) {
             int index = prop.getEnumValues().size() - 1;
             index = (int) ((Math.random() * ((index - 0) + 1)) + 0);
             value = prop.getEnumValues().get(index).toString();
         } else {
-            final long min = null != prop.getMin() ? prop.getMin().longValue() : Long.MIN_VALUE;
-            final long max = null != prop.getMax() ? prop.getMax().longValue() : Long.MAX_VALUE;
-            final double multipleOf = null != prop.getMultipleOf() ? prop.getMultipleOf().doubleValue() : 1;
+            long min = null != prop.getMin() ? prop.getMin().longValue() : Long.MIN_VALUE;
+            long max = null != prop.getMax() ? prop.getMax().longValue() : Long.MAX_VALUE;
+            double multipleOf = null != prop.getMultipleOf() ? prop.getMultipleOf().doubleValue() : 1;
 
-            final int range = (int) ((max - min) / multipleOf);
+            int range = (int) ((max - min) / multipleOf);
 
-            long values = (long) (min + (random.nextInt(range) * multipleOf));
+            final long values = (long) (min + (random.nextInt(range) * multipleOf));
             value = String.valueOf(values);
         }
         return value;
     }
 
 
-    private static String shortValue(Property prop) {
-        String value;
+    private static String shortValue(final Property prop) {
+        final String value;
         if (!isEmpty(prop.getEnumValues())) {
             int index = prop.getEnumValues().size() - 1;
             index = (int) ((Math.random() * ((index - 0) + 1)) + 0);
             value = prop.getEnumValues().get(index).toString();
         } else {
-            final short min = null != prop.getMin() ? prop.getMin().shortValue() : Short.MIN_VALUE;
-            final short max = null != prop.getMax() ? prop.getMax().shortValue() : Short.MAX_VALUE;
-            final double multipleOf = null != prop.getMultipleOf() ? prop.getMultipleOf().doubleValue() : 1;
+            short min = null != prop.getMin() ? prop.getMin().shortValue() : Short.MIN_VALUE;
+            short max = null != prop.getMax() ? prop.getMax().shortValue() : Short.MAX_VALUE;
+            double multipleOf = null != prop.getMultipleOf() ? prop.getMultipleOf().doubleValue() : 1;
 
-            final int range = (int) ((max - min) / multipleOf);
+            int range = (int) ((max - min) / multipleOf);
 
-            short values = (short) (min + (random.nextInt(range) * multipleOf));
+            final short values = (short) (min + (random.nextInt(range) * multipleOf));
             value = String.valueOf(values);
         }
         return value;
     }
 
-    private static String stringValue(Property prop) {
-        String value;
+    private static String stringValue(final Property prop) {
+        final String value;
         if (!isEmpty(prop.getEnumValues())) {
             int index = prop.getEnumValues().size() - 1;
             index = (int) ((Math.random() * ((index - 0) + 1)) + 0);
@@ -768,20 +768,20 @@ public class JsonGenerator {
         return value;
     }
 
-    private static String writeJsonSchema(String name, String jsonString, String path, boolean isPrint) {
+    private static String writeJsonSchema(final String name, final String jsonString, final String path, final boolean isPrint) {
         String prettyJso = null;
 
-        ObjectMapper mapper = new ObjectMapper();
-        Object json;
+        final ObjectMapper mapper = new ObjectMapper();
+        final Object json;
         try {
             json = mapper.readValue(jsonString, Object.class);
             prettyJso = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(json);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             LOGGER.log(Level.SEVERE, "Error while writing Json", e);
             throw new IllegalArgumentException("Unable to generate json schemas");
         }
         if (isPrint) {
-            File directory = new File(path);
+            final File directory = new File(path);
             LOGGER.log(Level.INFO, "Generating Path>>" + path);
             if (!directory.exists()) {
                 LOGGER.log(Level.INFO, "Generating Directories>>" + directory.mkdirs());
@@ -789,11 +789,11 @@ public class JsonGenerator {
                 LOGGER.log(Level.INFO, "Existing Directories>>");
             }
 
-            try (FileWriter fileWriter = new FileWriter(directory + File.separator + Efficacy.schemaName(name) + ".json")) {
+            try (final FileWriter fileWriter = new FileWriter(directory + File.separator + Efficacy.schemaName(name) + ".json")) {
 
                 fileWriter.write(prettyJso);
                 fileWriter.flush();
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 LOGGER.log(Level.SEVERE, "Error while Generating Json scheme", e);
                 throw new IllegalArgumentException("Unable to generate json schemas");
             }

@@ -1,14 +1,19 @@
 package com.bhadouriya.raml.efficacies;
 
 import com.bhadouriya.raml.artifacts.WrapperApi;
+import com.bhadouriya.raml.efficacies.demo.Response;
+import com.bhadouriya.raml.efficacies.demo.SubResponse;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
 import org.raml.v2.api.RamlModelBuilder;
 import org.raml.v2.api.RamlModelResult;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
+import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -17,15 +22,19 @@ import java.net.URL;
 import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import static java.nio.file.Files.createDirectories;
 import static java.util.Arrays.asList;
+import static java.util.Base64.getUrlDecoder;
+import static java.util.Base64.getUrlEncoder;
 import static org.apache.commons.io.FilenameUtils.isExtension;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang.StringUtils.uncapitalize;
@@ -34,13 +43,15 @@ import static org.springframework.util.FileSystemUtils.deleteRecursively;
 
 public class Efficacy {
 
-    public static String abbreviator(final String packageName) {
-        final String abbrev = alphaNumericWithSpace(packageName);
-        final String[] words = abbrev.split(" ");
-        final StringBuilder initials = new StringBuilder();
+    private static final ObjectMapper mapper = new ObjectMapper();
+
+    public static String abbreviator(String packageName) {
+        String abbrev = alphaNumericWithSpace(packageName);
+        String[] words = abbrev.split(" ");
+        StringBuilder initials = new StringBuilder();
         if (words.length > 1) {
-            final Pattern p = Pattern.compile("\\b[a-zA-Z]");
-            final Matcher m = p.matcher(abbrev);
+            Pattern p = Pattern.compile("\\b[a-zA-Z]");
+            Matcher m = p.matcher(abbrev);
             while (m.find()) {
                 initials.append(m.group());
             }
@@ -50,40 +61,40 @@ public class Efficacy {
         return initials.toString().toLowerCase();
     }
 
-    public static String alphaNumeric(final String packageName) {
+    public static String alphaNumeric(String packageName) {
         return packageName.replaceAll("[^a-zA-Z0-9]", "").trim();
     }
 
-    public static String alphaNumeric(final String packageName, final String replace) {
+    public static String alphaNumeric(String packageName, String replace) {
         return packageName.replaceAll("[^a-zA-Z0-9]", replace).trim();
     }
 
-    public static String alphaNumericWithSpace(final String packageName) {
+    public static String alphaNumericWithSpace(String packageName) {
         return packageName.replaceAll("[^a-zA-Z0-9 ]", "").trim();
     }
 
-    public static String capatalizeAndAppend(final String packageName) {
+    public static String capatalizeAndAppend(String packageName) {
         return alphaNumeric(capitalize(alphaNumeric(packageName, " ")));
     }
 
-    public static void deleteDir(final File dir) {
+    public static void deleteDir(File dir) {
         deleteRecursively(dir);
     }
 
-    public static String format(final long time) {
+    public static String format(long time) {
         return new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date(time));
     }
 
-    public static String getConstantName(final Class<?> clz, final String value, final boolean isEnum) {
-        String[] constantName = {""};
+    public static String getConstantName(Class<?> clz, String value, boolean isEnum) {
+        final String[] constantName = {""};
         asList(clz.getDeclaredFields()).forEach(fd -> {
-            final int mod = fd.getModifiers();
+            int mod = fd.getModifiers();
             try {
                 if (Modifier.isPublic(mod) && Modifier.isStatic(mod) && Modifier.isFinal(mod)
                         && (value.equalsIgnoreCase(fd.get(null).toString()) || (isEnum && value.equalsIgnoreCase(fd.getName())))) {
                     constantName[0] = fd.getName();
                 }
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 e.printStackTrace();
             }
         });
@@ -91,46 +102,46 @@ public class Efficacy {
         return constantName[0];
     }
 
-    public static URL getCurrentUrl(final HttpServletRequest request) {
+    public static URL getCurrentUrl(HttpServletRequest request) {
         try {
-            final URL url = new URL(request.getRequestURL().toString());
-            final String host = url.getHost();
-            final String userInfo = url.getUserInfo();
-            final String scheme = url.getProtocol();
-            final int port = url.getPort();
-            final String path = (String) request.getAttribute("javax.servlet.forward.request_uri");
-            final String query = (String) request.getAttribute("javax.servlet.forward.query_string");
-            final URI uri = new URI(scheme, userInfo, host, port, path, query, null);
+            URL url = new URL(request.getRequestURL().toString());
+            String host = url.getHost();
+            String userInfo = url.getUserInfo();
+            String scheme = url.getProtocol();
+            int port = url.getPort();
+            String path = (String) request.getAttribute("javax.servlet.forward.request_uri");
+            String query = (String) request.getAttribute("javax.servlet.forward.query_string");
+            URI uri = new URI(scheme, userInfo, host, port, path, query, null);
 
             return new URL(uri.toString());
-        } catch (MalformedURLException | URISyntaxException e) {
+        } catch (final MalformedURLException | URISyntaxException e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    private static String getIndentString(final int indent) {
-        final StringBuilder sb = new StringBuilder();
+    private static String getIndentString(int indent) {
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < indent; i++) {
             sb.append("|  ");
         }
         return sb.toString();
     }
 
-    public static String getStubUrl(final URL baseUrl, final String seperatorToUnix) {
+    public static String getStubUrl(URL baseUrl, String seperatorToUnix) {
         String stubUrl = seperatorToUnix;
         try {
             stubUrl = new URL(baseUrl, seperatorToUnix).toString();
-        } catch (MalformedURLException e) {
+        } catch (final MalformedURLException e) {
             e.printStackTrace();
         }
         return stubUrl;
     }
 
-    public static void listDirectories(final String direcName, final Map<String, File> directories) {
-        final File directory = new File(direcName);
-        final File[] fList = directory.listFiles();
-        for (final File file : fList) {
+    public static void listDirectories(String direcName, Map<String, File> directories) {
+        File directory = new File(direcName);
+        File[] fList = directory.listFiles();
+        for (File file : fList) {
             if (file.isFile()) {
                 continue;
             } else if (file.isDirectory()) {
@@ -142,17 +153,17 @@ public class Efficacy {
         }
     }
 
-    public static File loadFileFromClasspath(final String path) throws IOException {
+    public static File loadFileFromClasspath(String path) throws IOException {
         File file = new File(path);
         if (file.exists()) {
             return file;
         }
-        final ClassPathResource classPathResource = new ClassPathResource(path);
+        ClassPathResource classPathResource = new ClassPathResource(path);
         if (classPathResource.exists()) {
             file = classPathResource.getFile();
             return file;
         }
-        final URL url = Efficacy.class.getClassLoader().getResource("Failed to Load Dir from Classpath");
+        URL url = Efficacy.class.getClassLoader().getResource("Failed to Load Dir from Classpath");
         if (url != null) {
             file = new File(url.getFile());
             if (file.exists()) {
@@ -162,17 +173,17 @@ public class Efficacy {
         return file;
     }
 
-    public static String printDirectoryTree(final File dosire) {
+    public static String printDirectoryTree(File dosire) {
         if (!dosire.isDirectory()) {
             throw new IllegalArgumentException("Not Directory");
         }
         final int indent = 0;
-        final StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         printDirectoryTree(dosire, indent, sb);
         return sb.toString();
     }
 
-    public static void printDirectoryTree(final File dosire, final int indent, final StringBuilder sb) {
+    public static void printDirectoryTree(File dosire, int indent, StringBuilder sb) {
         if (!dosire.isDirectory()) {
             throw new IllegalArgumentException("Not Directory");
         }
@@ -181,7 +192,7 @@ public class Efficacy {
         sb.append(dosire.getName());
         sb.append("/");
         sb.append("\n");
-        for (final File file : dosire.listFiles()) {
+        for (File file : dosire.listFiles()) {
             if (file.isDirectory()) {
                 printDirectoryTree(file, indent + 1, sb);
             } else {
@@ -190,38 +201,38 @@ public class Efficacy {
         }
     }
 
-    private static void printFile(File file, int indent, StringBuilder sb) {
+    private static void printFile(final File file, final int indent, final StringBuilder sb) {
         sb.append(getIndentString(indent));
         sb.append("+--");
         sb.append(file.getName());
         sb.append("\n");
     }
 
-    public static void printToErr(final String str) {
+    public static void printToErr(String str) {
         System.err.println(str);
         System.err.flush();
         try {
             Thread.sleep(10);
-        } catch (InterruptedException e) {
+        } catch (final InterruptedException e) {
             e.printStackTrace();
         }
     }
 
-    public static void printToOut(final String str) {
+    public static void printToOut(String str) {
         System.out.println(str);
         System.out.flush();
         try {
             Thread.sleep(10);
-        } catch (InterruptedException e) {
+        } catch (final InterruptedException e) {
             e.printStackTrace();
         }
     }
 
-    public static WrapperApi readRaml(final String file) {
+    public static WrapperApi readRaml(String file) {
         WrapperApi wrapperApi = null;
-        final RamlModelResult ramlModelResult = new RamlModelBuilder().buildApi(file);
+        RamlModelResult ramlModelResult = new RamlModelBuilder().buildApi(file);
         if (ramlModelResult.hasErrors()) {
-            final List<String> errs = new ArrayList<>();
+            List<String> errs = new ArrayList<>();
             ramlModelResult.getValidationResults().forEach(validationResult -> {
                 errs.add(validationResult.getPath() + validationResult.getMessage());
             });
@@ -236,13 +247,13 @@ public class Efficacy {
 
     }
 
-    public static String schemaName(final String beanName) {
+    public static String schemaName(String beanName) {
         return uncapitalize(beanName.replaceAll("([A-Z])", "-$1").replaceFirst("-", ""));
     }
 
-    private static void unZipEachFile(final FileSystem fileSystem, final String[] apiRamlFile, final ZipFile file
-            , final Enumeration<? extends ZipEntry> entries, final String uncompressedDir) throws IOException {
-        final ZipEntry entry = entries.nextElement();
+    private static void unZipEachFile(FileSystem fileSystem, String[] apiRamlFile, ZipFile file
+            , Enumeration<? extends ZipEntry> entries, String uncompressedDir) throws IOException {
+        ZipEntry entry = entries.nextElement();
 
         //If Dir then create new Dir in uncompresse Folder
         if (entry.isDirectory()) {
@@ -250,10 +261,10 @@ public class Efficacy {
         }
         //Else create the file
         else {
-            final InputStream is = file.getInputStream(entry);
-            final BufferedInputStream bis = new BufferedInputStream(is);
-            final String unCompressedFileName = uncompressedDir + File.separator + entry.getName();
-            final Path unCompressedFilePath = fileSystem.getPath(unCompressedFileName);
+            InputStream is = file.getInputStream(entry);
+            BufferedInputStream bis = new BufferedInputStream(is);
+            String unCompressedFileName = uncompressedDir + File.separator + entry.getName();
+            Path unCompressedFilePath = fileSystem.getPath(unCompressedFileName);
             if (isExtension(entry.getName(), asList("raml", "RANL"))) {
                 if (isBlank(apiRamlFile[0]) && (null == new File(entry.getName()).getParent())) {
                     apiRamlFile[0] = unCompressedFileName;
@@ -265,7 +276,7 @@ public class Efficacy {
                 createDirectories(unCompressedFilePath.getParent());
             }
             Files.createFile(unCompressedFilePath);
-            try (FileOutputStream fileOutputStream = new FileOutputStream(unCompressedFileName)) {
+            try (final FileOutputStream fileOutputStream = new FileOutputStream(unCompressedFileName)) {
                 while (bis.available() > 0) {
                     fileOutputStream.write(bis.read());
                 }
@@ -273,21 +284,21 @@ public class Efficacy {
         }
     }
 
-    public static String[] unzipRaml(final MultipartFile mulFile, final String orininalName, final Path tempUserDirectory, final FileSystem fileSystem) throws IOException {
-        final String[] fileNames = {null, null, null};
+    public static String[] unzipRaml(MultipartFile mulFile, String orininalName, Path tempUserDirectory, FileSystem fileSystem) throws IOException {
+        String[] fileNames = {null, null, null};
 
-        final File zipFile = File.createTempFile(orininalName, null, tempUserDirectory.toFile());
+        File zipFile = File.createTempFile(orininalName, null, tempUserDirectory.toFile());
         IOUtils.copy(mulFile.getInputStream(), new FileOutputStream(zipFile));
 
         //Open File
-        try (ZipFile file = new ZipFile(zipFile)) {
+        try (final ZipFile file = new ZipFile(zipFile)) {
             //get the entries
-            final Enumeration<? extends ZipEntry> entries = file.entries();
+            Enumeration<? extends ZipEntry> entries = file.entries();
 
-            final Path tempRamlDir = Files.createTempDirectory(tempUserDirectory, orininalName + "_");
+            Path tempRamlDir = Files.createTempDirectory(tempUserDirectory, orininalName + "_");
 
             //we will unzip files in this folder
-            final String uncompressedDirectory = tempRamlDir.toString();
+            String uncompressedDirectory = tempRamlDir.toString();
 
             //Iterate over
 
@@ -300,4 +311,89 @@ public class Efficacy {
 
         }
     }
+
+
+    public static String decrypt(final String encrypt) {
+        final byte[] decodeBytes = getUrlDecoder().decode(encrypt);
+        return new String(decodeBytes);
+    }
+
+    public static <T> T decrypt(final String encrypt, final Class<T> type) throws IOException {
+        final byte[] decodeBytes = getUrlDecoder().decode(encrypt);
+        return parseJSON(new String(decodeBytes), type);
+    }
+
+
+    public static String encrypt(final Object object) throws IOException {
+        final String jsonString = toJSON(object);
+        final byte[] text = jsonString.getBytes();
+        return getUrlEncoder().withoutPadding().encodeToString(text);
+    }
+
+
+    public static String encrypt(final String plainString) throws IOException {
+        final byte[] text = plainString.getBytes();
+        return getUrlEncoder().withoutPadding().encodeToString(text);
+    }
+
+    private static <T> T parseJSON(final String jsonString, final Class<T> type) throws IOException {
+        return mapper.readValue(jsonString, type);
+    }
+
+    private static String toJSON(final Object object) throws IOException {
+        String result = "";
+        if (null != object) {
+            final ByteArrayOutputStream out = new ByteArrayOutputStream();
+            mapper.writeValue(out, object);
+            result = out.toString("UTF-8");
+        }
+        return result;
+    }
+
+    private static void printConstantValues() throws IOException, IllegalAccessException {
+        Path path = Paths.get("./Error.txt");
+        Field[] fields = SubResponse.class.getDeclaredFields();
+        try (BufferedWriter bufferedWriter = Files.newBufferedWriter(path)) {
+            for (Field f : fields
+            ) {
+                if (Modifier.isStatic(f.getModifiers()) && (f.getType() == SubResponse.class || f.getType() == Response.class)) {
+                    SubResponse subResponse = (SubResponse) f.get(null);
+
+                    bufferedWriter.write(subResponse.getCode() + "|" + subResponse.getDescription()
+                            + "|" + printFieldValue(subResponse.getAttributes()) + "\n");
+                }
+            }
+        }
+    }
+
+    //Access private field by using field name
+    private static String printFieldValue(List<?> attributes) {
+        String finalList = "";
+        if (!CollectionUtils.isEmpty(attributes)) {
+            finalList = attributes.stream().map(obj -> {
+                String value = null;
+                Field field = null;
+                try {
+                    field = obj.getClass().getDeclaredField("description");
+                } catch (Exception e) {
+                    try {
+                        field = obj.getClass().getSuperclass().getDeclaredField("description");
+                    } catch (Exception e1) {
+                        value = "NO_SUCH_FIELD$$$";
+                    }
+                }
+                if (null != field && Modifier.isPrivate(field.getModifiers())) {
+                    field.setAccessible(true);
+                    try {
+                        value = (String) field.get(obj);
+                    } catch (Exception e1) {
+                        value = "NO_SUCH_FIELD$$$";
+                    }
+                }
+                return value;
+            }).collect(Collectors.joining(","));
+        }
+        return finalList;
+    }
+
 }
