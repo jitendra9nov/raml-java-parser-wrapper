@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" content="text/html" http-equiv="Content-Type">
+    <title>Redirecting</title>
+    <script>
+        window.onload = function () {
+            // Change this value to seconds you want to delay the text.
+            var theDelay = 10;
+            document.forms[0].submit();
+            var timer = setTimeout("showText()", theDelay * 1000)
+        }
+
+        function showText() {
+            document.getElementById("delayedText").style.visibility = "visible";
+        }
+    </script>
+</head>
+<body>
+<div id="delayedText" style="visibility: hidden">
+    <p align="center" style="font-size: 20px;color: rgb(0,116,166);font-family: sans-serif;font-weight: 300">Something
+        Successful.</p>
+    <p align="center" style="font-size: 20px;color: rgb(0,116,166);font-family: sans-serif;font-weight: 300">You are
+        being Redireted to your application---</p>
+    <p align="center" style="font-size: 20px;color: rgb(0,116,166);font-family: sans-serif;font-weight: 300">Please
+        reach out to the support</p>
+</div>
+<noscript>
+    <p>
+        <strong>Note:</strong>
+        Since your browser does not support
+        JavaScript, you must press the Resume button once to proceed.
+    </p>
+</noscript>
+<form action="/api/index" method="GET">
+    <input name="something" type="hidden" value="">
+    <noscript>
+        <input type="submit" value="Resume">
+    </noscript>
+</form>
+</body>
+</html>

@@ -371,6 +371,7 @@ public class Validator {
                 requestBody = request.getReader().lines().collect(joining());
             }
             StubCacheEntity stubCacheEntity = new CacheServiceImpl().getStubById(stubId);
+
             this.doRamlValidation(requestBody, stubResourcePath, methodType, queryParam, stubCacheEntity.getStubValidationService());
             responseEntity = doRuleValidation(requestBody, stubResourcePath, methodType, stubCacheEntity.getWrapperApi());
         } catch (final Exception e) {

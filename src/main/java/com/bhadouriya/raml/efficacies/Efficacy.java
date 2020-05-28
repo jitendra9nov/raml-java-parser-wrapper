@@ -23,6 +23,7 @@ import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -396,4 +397,7 @@ public class Efficacy {
         return finalList;
     }
 
+    public static String createClasName(String prefix, String baseClass) {
+        return MessageFormat.format("{0}{1}", capitalize(prefix), capitalize(baseClass));
+    }
 }
