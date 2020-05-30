@@ -10,6 +10,7 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.net.URI;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -18,7 +19,7 @@ import static java.awt.FileDialog.LOAD;
 import static java.awt.Font.*;
 import static java.awt.GridBagConstraints.*;
 import static java.io.File.separator;
-import static org.apache.commons.lang.StringUtils.isEmpty;
+import static org.apache.commons.lang.StringUtils.*;
 
 public class AccreditorPanel extends JFrame implements ActionListener {
 
@@ -34,47 +35,26 @@ public class AccreditorPanel extends JFrame implements ActionListener {
     boolean parent;
 
     private AccreditorPanel() {
-        this.setTitle("Accreditor");
-        this.ininUI();
+        super("Accreditor");
+        this.initUI();
     }
 
-    private AccreditorPanel(boolean parent) {
+    private AccreditorPanel(final boolean parent) {
         this();
         this.parent = parent;
     }
 
-    public static AccreditorPanel getInstance(boolean parent) {
+    public static AccreditorPanel getInstance(final boolean parent) {
         if (null == instance) {
             instance = new AccreditorPanel(parent);
-        } else {
-            try {
-                final String clipboardText = getClipboardContents();
-                instance.certImportText.setText(clipboardText);
-            } catch (final Exception e) {
-                LOGGER.log(Level.SEVERE, "Instance", e);
-            }
         }
+
         instance.setVisible(true);
         return instance;
     }
 
-    private static Clipboard getSystemClipboard() {
-        return Toolkit.getDefaultToolkit().getSystemClipboard();
 
-    }
-
-    private static String getClipboardContents() throws IOException, UnsupportedFlavorException {
-        final Clipboard systemClipboard = getSystemClipboard();
-        final DataFlavor dataFlavor = DataFlavor.stringFlavor;
-
-        if (systemClipboard.isDataFlavorAvailable(dataFlavor)) {
-            final Object text = systemClipboard.getData(dataFlavor);
-            return (String) text;
-        }
-        return null;
-    }
-
-    public static void main(final String[] args) {
+    public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -83,21 +63,21 @@ public class AccreditorPanel extends JFrame implements ActionListener {
         });
     }
 
-    private void ininUI() {
+    private void initUI() {
         //setDefaultLookAndFeelDecorated(true);
 
         this.setIconImage(this.loadImage("cert.png"));
         //this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        String title = this.getTitle();
+        final String title = this.getTitle();
 
         this.addWindowListener(new WindowAdapter() {
             @Override
-            public void windowClosing(WindowEvent e) {
-                Object[] options = {"Yes", "No"};
+            public void windowClosing(final WindowEvent e) {
+                final Object[] options = {"Yes", "No"};
 
                 //Ask for confirmation before termination the program.
-                int option = JOptionPane.showOptionDialog(null, "Are you sure you want to close the '" + title + "' application?",
+                final int option = JOptionPane.showOptionDialog(null, "Are you sure you want to close the '" + title + "' application?",
                         "Close Confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
 
                 if (option == JOptionPane.YES_OPTION) {
@@ -111,15 +91,12 @@ public class AccreditorPanel extends JFrame implements ActionListener {
 
         });
 
-        this.setResizable(false);
-        this.setSize(450, 130);
-        this.setLocationRelativeTo(null);
-        this.setVisible(true);
+
         this.certImportText = new JTextField(30) {
 
             @Override
             public JToolTip createToolTip() {
-                final JToolTip toolTip = super.createToolTip();
+                JToolTip toolTip = super.createToolTip();
                 toolTip.setBackground(Color.BLACK);
                 toolTip.setForeground(new Color(255, 255, 51));
                 toolTip.setFont(new Font(DIALOG, BOLD + ITALIC, 10));
@@ -130,7 +107,7 @@ public class AccreditorPanel extends JFrame implements ActionListener {
 
             @Override
             public JToolTip createToolTip() {
-                final JToolTip toolTip = super.createToolTip();
+                JToolTip toolTip = super.createToolTip();
                 toolTip.setBackground(Color.BLACK);
                 toolTip.setForeground(new Color(255, 255, 51));
                 toolTip.setFont(new Font(DIALOG, BOLD + ITALIC, 10));
@@ -141,44 +118,52 @@ public class AccreditorPanel extends JFrame implements ActionListener {
 
             @Override
             public JToolTip createToolTip() {
-                final JToolTip toolTip = super.createToolTip();
+                JToolTip toolTip = super.createToolTip();
                 toolTip.setBackground(Color.BLACK);
                 toolTip.setForeground(new Color(255, 255, 51));
                 toolTip.setFont(new Font(DIALOG, BOLD + ITALIC, 10));
                 return toolTip;
             }
         };
+
         this.createTabbedPane();
+        this.setResizable(false);
+        this.setSize(450, 140);
+        this.setLocationRelativeTo(null);
+        this.setVisible(true);
     }
 
     private void createTabbedPane() {
-        final JTabbedPane tabbedPane = new JTabbedPane();
-        final ImageIcon icon = null;
+        JTabbedPane tabbedPane = new JTabbedPane();
+        ImageIcon icon = null;
 
-        final JComponent importCert = this.makeTextPane("Import From URL", this.certImportBtn, this.certImportText, true);
+        JComponent importCert = this.makeTextPane("Import", this.certImportBtn, this.certImportText, true);
         tabbedPane.addTab("Import from URL", icon, importCert, "Import Missing Certificate");
         tabbedPane.setMnemonicAt(0, KeyEvent.VK_1);
 
-        final JComponent importFileCert = this.makeTextPane("Import From File", this.certImportFileBtn, this.certImportFileText, true);
+        JComponent importFileCert = this.makeTextPane("Import", this.certImportFileBtn, this.certImportFileText, true);
         tabbedPane.addTab("Import from File", icon, importFileCert, "Import Missing Certificate");
         tabbedPane.setMnemonicAt(1, KeyEvent.VK_2);
 
-        final JComponent deleteCert = this.makeTextPane("Delete", this.certDeleteBtn, this.certDeleteText, true);
+        JComponent deleteCert = this.makeTextPane("Delete", this.certDeleteBtn, this.certDeleteText, true);
         tabbedPane.addTab("Delete Cert", icon, deleteCert, "Delete Existing Certificate");
         tabbedPane.setMnemonicAt(2, KeyEvent.VK_3);
 
         tabbedPane.addFocusListener(new FocusListener() {
             @Override
-            public void focusGained(final FocusEvent e) {
+            public void focusGained(FocusEvent e) {
                 switch (tabbedPane.getSelectedIndex()) {
                     case 0:
                         AccreditorPanel.this.certImportText.grabFocus();
+                        AccreditorPanel.this.copyFromClipboard(AccreditorPanel.this.certImportText);
                         break;
                     case 1:
                         AccreditorPanel.this.certImportFileText.grabFocus();
+                        AccreditorPanel.this.copyFromClipboard(AccreditorPanel.this.certImportFileText);
                         break;
                     case 2:
                         AccreditorPanel.this.certDeleteText.grabFocus();
+                        AccreditorPanel.this.copyFromClipboard(AccreditorPanel.this.certDeleteText);
                         break;
                     default:
                         break;
@@ -186,7 +171,7 @@ public class AccreditorPanel extends JFrame implements ActionListener {
             }
 
             @Override
-            public void focusLost(final FocusEvent e) {
+            public void focusLost(FocusEvent e) {
 
             }
         });
@@ -198,14 +183,43 @@ public class AccreditorPanel extends JFrame implements ActionListener {
 
     }
 
-    protected JComponent makeTextPane(final String text, final JButton jButton, final JTextField jTextField, final boolean urlOnly) {
-        final JPanel mainPanel = new JPanel();
+    private void copyFromClipboard(final JTextField jTextField) {
+        try {
+            String clipboardText = this.getClipboardContents();
+            if (isNotBlank(clipboardText) && isBlank(jTextField.getText())) {
+                jTextField.setText(clipboardText);
+            }
+
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Instance", e);
+        }
+    }
+
+    private Clipboard getSystemClipboard() {
+        return Toolkit.getDefaultToolkit().getSystemClipboard();
+
+    }
+
+    private String getClipboardContents() throws IOException, UnsupportedFlavorException {
+        Clipboard systemClipboard = this.getSystemClipboard();
+        DataFlavor dataFlavor = DataFlavor.stringFlavor;
+
+        if (systemClipboard.isDataFlavorAvailable(dataFlavor)) {
+            Object text = systemClipboard.getData(dataFlavor);
+            return (String) text;
+        }
+        return null;
+    }
+
+    protected JComponent makeTextPane(String text, JButton jButton, JTextField jTextField, boolean urlOnly) {
+        JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new GridBagLayout());
-        final GridBagConstraints gridBagConstraints = new GridBagConstraints();
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
 
         jTextField.addFocusListener(new FocusListener() {
             @Override
-            public void focusGained(final FocusEvent e) {
+            public void focusGained(FocusEvent e) {
+                AccreditorPanel.this.copyFromClipboard(jTextField);
                 jTextField.setBackground(new Color(255, 255, 10));
                 jTextField.setFont(new Font(DIALOG, BOLD, 12));
                 jTextField.setToolTipText("Please provide valid https URL (e.g. https://domain.com)" +
@@ -213,14 +227,14 @@ public class AccreditorPanel extends JFrame implements ActionListener {
             }
 
             @Override
-            public void focusLost(final FocusEvent e) {
+            public void focusLost(FocusEvent e) {
 
             }
         });
 
         jTextField.addKeyListener(new KeyAdapter() {
             @Override
-            public void keyPressed(final KeyEvent e) {
+            public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
                     jButton.doClick();
                 }
@@ -235,19 +249,19 @@ public class AccreditorPanel extends JFrame implements ActionListener {
 
 
             @Override
-            public void mouseEntered(final MouseEvent e) {
+            public void mouseEntered(MouseEvent e) {
                 ToolTipManager.sharedInstance().setInitialDelay(0);
                 ToolTipManager.sharedInstance().setDismissDelay(Integer.MAX_VALUE);
             }
 
             @Override
-            public void mouseExited(final MouseEvent e) {
+            public void mouseExited(MouseEvent e) {
                 ToolTipManager.sharedInstance().setInitialDelay(this.defaultTimeout);
                 ToolTipManager.sharedInstance().setDismissDelay(this.defaultDismiss);
             }
         });
 
-        final JLabel lblUrl = new JLabel("Delete".equals(text) ? "URL/Alias" : "URL:");
+        JLabel lblUrl = new JLabel("Delete".equals(text) ? "URL/Alias" : "URL:");
         lblUrl.setFont(new Font(DIALOG, BOLD, 12));
         lblUrl.setLabelFor(jTextField);
 
@@ -257,25 +271,25 @@ public class AccreditorPanel extends JFrame implements ActionListener {
         jButton.setToolTipText(text + " Certificate");
         jButton.addActionListener(this);
 
-        final KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.CTRL_MASK);
-        final InputMap inputMap = jButton.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        final ActionMap actionMap = jButton.getActionMap();
+        KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.CTRL_MASK);
+        InputMap inputMap = jButton.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        ActionMap actionMap = jButton.getActionMap();
 
         inputMap.put(keyStroke, keyStroke.toString());
 
 
         actionMap.put(keyStroke.toString(), new AbstractAction() {
             @Override
-            public void actionPerformed(final ActionEvent e) {
+            public void actionPerformed(ActionEvent e) {
                 jButton.doClick();
             }
         });
 
-        final JPanel importPanel = new JPanel();
+        JPanel importPanel = new JPanel();
 
         importPanel.setLayout(new GridBagLayout());
 
-        final GridBagConstraints bagConstraints = new GridBagConstraints();
+        GridBagConstraints bagConstraints = new GridBagConstraints();
 
         bagConstraints.anchor = NORTHWEST;
         bagConstraints.fill = HORIZONTAL;
@@ -315,26 +329,26 @@ public class AccreditorPanel extends JFrame implements ActionListener {
 
     }
 
-    private BufferedImage loadImage(final String imageName) {
+    private BufferedImage loadImage(String imageName) {
         try {
             return ImageIO.read(this.getClass().getResource(separator + "artifacts" + separator + imageName));
-        } catch (final Exception e) {
+        } catch (Exception e) {
             LOGGER.log(Level.SEVERE, imageName, e);
         }
         return null;
     }
 
     @Override
-    public void actionPerformed(final ActionEvent e) {
+    public void actionPerformed(ActionEvent e) {
         if (e.getSource() == this.certImportBtn) {
             this.importCertificate(false, this.certImportText, null);
         } else if (e.getSource() == this.certImportFileBtn) {
-            final FileDialog fileDialog = new FileDialog(this, "Choose a certificate file", LOAD);
+            FileDialog fileDialog = new FileDialog(this, "Choose a certificate file", LOAD);
             fileDialog.setDirectory(System.getProperty("user.home") + "/Downloads");
             fileDialog.setFile("*.cer;*.crt;*.cert;*.txt");
             fileDialog.setVisible(true);
-            final String fileName = fileDialog.getFile();
-            final String fileDir = fileDialog.getDirectory();
+            String fileName = fileDialog.getFile();
+            String fileDir = fileDialog.getDirectory();
 
             if (null != fileName) {
                 LOGGER.log(Level.INFO, "File Chosen" + fileDir + fileName);
@@ -345,7 +359,7 @@ public class AccreditorPanel extends JFrame implements ActionListener {
         }
     }
 
-    private void importCertificate(final boolean isDel, final JTextField cerText, final String certFilePath) {
+    private void importCertificate(boolean isDel, JTextField cerText, String certFilePath) {
         String url = null;
 
         try {
@@ -362,7 +376,7 @@ public class AccreditorPanel extends JFrame implements ActionListener {
             }
 
 
-        } catch (Exception e) {
+        } catch (final Exception e) {
             JOptionPane.showMessageDialog(null, (null != e.getMessage() ? e.getMessage() : "Unable to "
                             + (isDel ? "Delete " : "Import ")), (isEmpty(url) ? "URL " : (isDel ? "Delete " : "Import ")) + "Error",
                     JOptionPane.ERROR_MESSAGE, null);
@@ -370,5 +384,16 @@ public class AccreditorPanel extends JFrame implements ActionListener {
             cerText.grabFocus();
             LOGGER.log(Level.WARNING, "Certificate", e);
         }
+    }
+
+    private boolean isValidUrl(final String url) {
+        final boolean isValidUrl = false;
+        try {
+            new URI(url).toURL();
+        } catch (final Exception e) {
+            LOGGER.log(Level.WARNING, "Invalid URL " + url, e);
+        }
+
+        return isValidUrl;
     }
 }
