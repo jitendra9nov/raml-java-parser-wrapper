@@ -12,6 +12,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -26,12 +27,16 @@ import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+import java.util.zip.ZipOutputStream;
 
+import static java.io.File.separator;
 import static java.nio.file.Files.createDirectories;
 import static java.util.Arrays.asList;
 import static java.util.Base64.getUrlDecoder;
@@ -40,11 +45,13 @@ import static org.apache.commons.io.FilenameUtils.isExtension;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang.StringUtils.uncapitalize;
 import static org.apache.commons.lang.WordUtils.capitalize;
+import static org.springframework.http.HttpHeaders.*;
 import static org.springframework.util.FileSystemUtils.deleteRecursively;
 
 public class Efficacy {
 
     private static final ObjectMapper mapper = new ObjectMapper();
+    private static final Logger LOGGER = Logger.getLogger(Efficacy.class.getName());
 
     public static String abbreviator(String packageName) {
         String abbrev = alphaNumericWithSpace(packageName);
@@ -258,13 +265,13 @@ public class Efficacy {
 
         //If Dir then create new Dir in uncompresse Folder
         if (entry.isDirectory()) {
-            createDirectories(fileSystem.getPath(uncompressedDir + File.separator + entry.getName()));
+            createDirectories(fileSystem.getPath(uncompressedDir + separator + entry.getName()));
         }
         //Else create the file
         else {
             InputStream is = file.getInputStream(entry);
             BufferedInputStream bis = new BufferedInputStream(is);
-            String unCompressedFileName = uncompressedDir + File.separator + entry.getName();
+            String unCompressedFileName = uncompressedDir + separator + entry.getName();
             Path unCompressedFilePath = fileSystem.getPath(unCompressedFileName);
             if (isExtension(entry.getName(), asList("raml", "RANL"))) {
                 if (isBlank(apiRamlFile[0]) && (null == new File(entry.getName()).getParent())) {
@@ -399,5 +406,165 @@ public class Efficacy {
 
     public static String createClasName(String prefix, String baseClass) {
         return MessageFormat.format("{0}{1}", capitalize(prefix), capitalize(baseClass));
+    }
+
+    public static boolean renameFile(String src, String trgt) {
+        File srcDir = new File(src);//e.g rule-validator.txt
+        File trgtDir = new File(trgt);//e.g rule-validator.jar
+        boolean renamed = srcDir.renameTo(trgtDir);
+        LOGGER.log(Level.INFO, "Renamed: " + renamed);
+        return renamed;
+    }
+
+    public void download(HttpServletResponse response, String type, String path) {
+        boolean isJar = "jar".equals(type);
+
+        File fileToZip = new File(path);
+
+        if (Files.exists(fileToZip.toPath())) {
+            if (isJar) {
+                try {
+                    String s = null;
+
+                    ProcessBuilder processBuilder = new ProcessBuilder("cmd", "/c", "buildMe.bat");
+                    File dir = new File(fileToZip.getPath() + separator);
+                    processBuilder.directory(dir);
+                    Process process = processBuilder.start();
+                    process.waitFor();
+
+                    BufferedReader stdInput = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                    BufferedReader stdError = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+
+                    //read the output from command
+                    printToOut("here is the standard output of the command:\n");
+
+                    while ((s = stdInput.readLine()) != null) {
+                        printToOut(s);
+                    }
+
+                    //read any error  from attempted command
+                    printToErr("here is the standard error of the command (if any):\n");
+
+                    while ((s = stdError.readLine()) != null) {
+                        printToErr(s);
+                    }
+
+                } catch (IOException | InterruptedException e) {
+                    e.printStackTrace();
+                    throw new IllegalArgumentException();
+                }
+            }
+
+            try {
+                //To Change
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                ZipOutputStream zipOutputStream = new ZipOutputStream(baos);
+                try {
+                    if (!isJar) {
+                        this.zipByte(fileToZip, fileToZip.getName(), zipOutputStream, isJar);
+
+                        File clickMe = new File(fileToZip.getParent() + separator + "clickMe.bat");
+
+                        Files.write(clickMe.toPath(), ("." + separator + fileToZip.getName() + separator
+                                + "gradlew -p ." + separator + fileToZip.getName() + " spotlessApply clean runJar").getBytes());
+
+                        this.zipByte(clickMe, clickMe.getName(), zipOutputStream, isJar);
+
+                        File readMe = new File(fileToZip.getParent() + separator + "README.txt");
+
+                        Files.write(readMe.toPath(), ("This file contains Text about the Utility").getBytes());
+
+                        this.zipByte(readMe, readMe.getName(), zipOutputStream, isJar);
+
+                    } else {
+                        File executor = new File("/resources/artifacts" + separator + "executor.bat");
+
+                        this.zipByte(executor, executor.getName(), zipOutputStream, isJar);
+
+                        File appJar = new File(fileToZip + separator + "build" + separator + "libs" + separator + "app.jar");
+
+                        this.zipByte(appJar, appJar.getName(), zipOutputStream, isJar);
+
+                        File raml = new File(fileToZip + separator + "src" + separator + "main" + separator + "resources" + separator + "raml");
+
+                        this.zipByte(raml, raml.getName(), zipOutputStream, isJar);
+
+
+                        File readMe = new File(fileToZip.getParent() + separator + "README.txt");
+
+                        Files.write(readMe.toPath(), ("This file contains Text about the Utility").getBytes());
+
+                        this.zipByte(readMe, readMe.getName(), zipOutputStream, isJar);
+
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    throw new IllegalArgumentException();
+                }
+                zipOutputStream.close();
+                baos.close();
+
+                byte[] zipByts = baos.toByteArray();
+
+                response.setHeader(CONTENT_DISPOSITION, "attachement;filename=\"" + fileToZip.getName() +
+                        (isJar ? "-jar" : "-src") + "-generated.zip" + "\"");
+                response.setHeader(PRAGMA, "public");
+                response.setHeader(EXPIRES, "0");
+                response.setHeader(CACHE_CONTROL, "must-revalidate, post=check =0, pre-check =0");
+                response.setHeader(CONTENT_TYPE, "application - download");
+                response.setHeader("Content-Transfer-Encoding", "binary");
+                response.setHeader(ACCESS_CONTROL_EXPOSE_HEADERS, CONTENT_DISPOSITION + ',' + CONTENT_LENGTH);
+
+                OutputStream outputStream = response.getOutputStream();
+
+                outputStream.write(zipByts);
+                outputStream.close();
+                response.flushBuffer();
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new IllegalArgumentException();
+            }
+
+        } else {
+            throw new IllegalArgumentException();
+        }
+
+    }
+
+    private void zipByte(File fileToZip, String fileName, ZipOutputStream zipOutputStream, boolean isJar) throws IOException {
+        if (fileToZip.isHidden() || (null != fileName && (fileName.contains("buildMe.bat")
+                || (!isJar && fileName.contains("executor.bat"))
+                || (fileName.endsWith(".log"))
+                || (fileName.endsWith("build"))
+                || (fileName.contains("application.properties")))
+        )) {
+            return;
+        }
+
+        if (fileToZip.isDirectory()) {
+            if (fileName.endsWith("/")) {
+                zipOutputStream.putNextEntry(new ZipEntry(fileName));
+                zipOutputStream.closeEntry();
+            } else {
+                zipOutputStream.putNextEntry(new ZipEntry(fileName + "/"));
+                zipOutputStream.closeEntry();
+            }
+            File[] children = fileToZip.listFiles();
+            for (File child : children
+            ) {
+                this.zipByte(child, fileName + "/" + child.getName(), zipOutputStream, isJar);
+            }
+            return;
+        }
+
+        InputStream is = new FileInputStream(fileToZip);
+        if (!isJar && fileName.contains("application-src.properties")) {
+            fileName = fileName.replace("application-src.properties", "application.properties");
+        }
+        ZipEntry zipEntry = new ZipEntry(fileName);
+        zipOutputStream.putNextEntry(zipEntry);
+
+        IOUtils.copy(is, zipOutputStream);
+        is.close();
     }
 }
