@@ -348,7 +348,7 @@ public class Efficacy {
         return mapper.readValue(jsonString, type);
     }
 
-    private static String toJSON(final Object object) throws IOException {
+    public static String toJSON(final Object object) throws IOException {
         String result = "";
         if (null != object) {
             final ByteArrayOutputStream out = new ByteArrayOutputStream();
